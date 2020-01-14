@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cstdio>
+#include <cstdlib>
 
 #define SSASSERT(condition)                                                                                            \
     if (!(condition))                                                                                                  \

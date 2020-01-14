@@ -5,17 +5,12 @@
 #pragma once
 
 #include "RefCounted.h"
+#include "RuntimeTypeInfo.h"
 #include "Variant.h"
 #include "thirdparty/sigslot.h"
 
 namespace ss
 {
-
-struct RuntimeTypeInfo
-{
-    const char *name;
-    const RuntimeTypeInfo *parent;
-};
 
 #define SS_OBJECT(clazz, base)                                                                                         \
 public:                                                                                                                \
@@ -88,4 +83,4 @@ private:
     Signal signals;
 };
 
-}
+} // namespace ss

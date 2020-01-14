@@ -63,6 +63,21 @@ public:
         return static_cast<T *>(refCounter_->object);
     }
 
+    explicit operator bool() const
+    {
+        return Get() != nullptr;
+    }
+
+    bool operator!() const
+    {
+        return Get() == nullptr;
+    }
+
+    explicit operator T *() const
+    {
+        return Get();
+    }
+
     T *operator->() const
     {
         return Get();
@@ -73,7 +88,7 @@ public:
         return *Get();
     }
 
-    SharedPtr &operator=(const SharedPtr &p)
+    SharedPtr &operator=(const SharedPtr &p) noexcept
     {
         if (p.refCounter_ != refCounter_)
         {
@@ -298,4 +313,4 @@ template <class T, class P> inline bool operator!=(const WeakPtr<T> &t, const We
     return t.refCounter_ != p.refCounter_;
 }
 
-}
+} // namespace ss

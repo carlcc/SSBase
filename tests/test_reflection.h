@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <SSBase/ClassDB.h>
 #include <SSBase/Object.h>
 
 namespace TestReflection
@@ -25,9 +26,26 @@ public:
 
 class Child3 : public ss::Object
 {
-SS_OBJECT(Child3, ss::Object)
+    SS_OBJECT(Child3, ss::Object)
 
 public:
+};
+
+
+
+class Child4 : public ss::Object
+{
+SS_OBJECT(Child4, ss::Object)
+
+public:
+    Child4()
+    {
+        std::cout << "Construct child4" << std::endl;
+    }
+    ~Child4()
+    {
+        std::cout << "Destruct child4" << std::endl;
+    }
 };
 
 bool test()
@@ -43,7 +61,10 @@ bool test()
     SSASSERT(c3.IsInstanceOf<Child3>());
     SSASSERT(c3.IsInstanceOf<ss::Object>());
 
+    ss::ClassDB::RegisterConstructor<Child4>();
+    ss::ClassDB::Construct<Child4>();
+
     return true;
 }
 
-}
+} // namespace TestReflection
