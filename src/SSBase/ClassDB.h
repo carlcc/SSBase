@@ -1,0 +1,14 @@
+//
+// Copyright (c) 2020 Carl Chen. All rights reserved.
+//
+
+#pragma once
+
+namespace ss
+{
+
+class ClassDB
+{
+};
+
+}
