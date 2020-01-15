@@ -98,6 +98,12 @@ public:
         *this = v;
     }
 
+    Variant(Variant &&v) noexcept // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+        : type_(kTypeInt), value_()
+    {
+        *this = std::move(v);
+    }
+
     Variant(int v) : type_(kTypeInt), value_() // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
     {
         *this = v;
@@ -124,6 +130,12 @@ public:
     }
 
     Variant(const std::string &v) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+        : type_(kTypeInt), value_()
+    {
+        *this = v;
+    }
+
+    Variant(const char *v) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
         : type_(kTypeInt), value_()
     {
         *this = v;
@@ -219,6 +231,13 @@ public:
         *this = v;
     }
 
+    template <class T>
+    Variant(const SharedPtr<T> &v) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+        : type_(kTypeInt), value_()
+    {
+        *this = SharedPtr<RefCounted>(v);
+    }
+
     Variant(void *v) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
         : type_(kTypeInt), value_()
     {
@@ -235,6 +254,11 @@ public:
         : type_(kTypeInt), value_()
     {
         *this = v;
+    }
+
+    ~Variant()
+    {
+        SetType(kTypeInt);
     }
 
     Variant &operator=(int v)
@@ -276,6 +300,12 @@ public:
     {
         SetType(kTypeString);
         value_.string_ = v;
+        return *this;
+    }
+
+    Variant &operator=(const char *v)
+    {
+        *this = std::string(v);
         return *this;
     }
 
@@ -407,16 +437,146 @@ public:
 
     Variant &operator=(const Variant &v);
 
+    Variant &operator=(Variant &&v) noexcept;
+
     Type GetType() const
     {
         return type_;
     }
 
+    int GetInt() const
+    {
+        SSASSERT(type_ == kTypeInt);
+        return value_.int_;
+    }
+    int64_t GetInt64() const
+    {
+        SSASSERT(type_ == kTypeInt64);
+        return value_.int64_;
+    }
+    float GetFloat() const
+    {
+        SSASSERT(type_ == kTypeFloat);
+        return value_.float_;
+    }
+    double GetDouble() const
+    {
+        SSASSERT(type_ == kTypeDouble);
+        return value_.double_;
+    }
+    bool GetBool() const
+    {
+        SSASSERT(type_ == kTypeBool);
+        return value_.bool_;
+    }
+    String GetString() const
+    {
+        SSASSERT(type_ == kTypeString);
+        return value_.string_;
+    }
+    Color GetColor() const
+    {
+        SSASSERT(type_ == kTypeColor);
+        return value_.color_;
+    }
+    Quaternion GetQuaternion() const
+    {
+        SSASSERT(type_ == kTypeQuaternion);
+        return value_.quaternion_;
+    }
+    Vector2 GetVector2f() const
+    {
+        SSASSERT(type_ == kTypeVector2f);
+        return value_.vector2_;
+    }
+    Vector3 GetVector3f() const
+    {
+        SSASSERT(type_ == kTypeVector3f);
+        return value_.vector3_;
+    }
+    Vector4 GetVector4f() const
+    {
+        SSASSERT(type_ == kTypeVector4f);
+        return value_.vector4_;
+    }
+    Vector2i GetVector2i() const
+    {
+        SSASSERT(type_ == kTypeVector2i);
+        return value_.vector2i_;
+    }
+    Vector3i GetVector3i() const
+    {
+        SSASSERT(type_ == kTypeVector3i);
+        return value_.vector3i_;
+    }
+    Vector4i GetVector4i() const
+    {
+        SSASSERT(type_ == kTypeVector4i);
+        return value_.vector4i_;
+    }
+    Matrix2 GetMatrix2f() const
+    {
+        SSASSERT(type_ == kTypeMatrix2f);
+        return value_.matrix2_;
+    }
+    Matrix3 GetMatrix3f() const
+    {
+        SSASSERT(type_ == kTypeMatrix3f);
+        return value_.matrix3_;
+    }
+    Matrix4 GetMatrix4f() const
+    {
+        SSASSERT(type_ == kTypeMatrix4f);
+        return value_.matrix4_;
+    }
+    Matrix2i GetMatrix2i() const
+    {
+        SSASSERT(type_ == kTypeMatrix2i);
+        return value_.matrix2i_;
+    }
+    Matrix3i GetMatrix3i() const
+    {
+        SSASSERT(type_ == kTypeMatrix3i);
+        return value_.matrix3i_;
+    }
+    Matrix4i GetMatrix4i() const
+    {
+        SSASSERT(type_ == kTypeMatrix4i);
+        return value_.matrix4i_;
+    }
+    SharedPtr<RefCounted> GetPtr() const
+    {
+        SSASSERT(type_ == kTypePtr);
+        return value_.ptr_;
+    }
+    void *GetRawPtr() const
+    {
+        SSASSERT(type_ == kTypeRawPtr);
+        return value_.rawPtr_;
+    }
+    Vector &GetVector()
+    {
+        SSASSERT(type_ == kTypeVector);
+        return value_.vector_;
+    }
+    Map &GetMap()
+    {
+        SSASSERT(type_ == kTypeMap);
+        return value_.map_;
+    }
+
+private:
     void SetType(Type t);
 
 private:
     Type type_;
     Value value_;
+
+    friend bool operator==(const Variant &a, const Variant &b);
+    friend bool operator!=(const Variant &a, const Variant &b);
 };
+
+bool operator==(const Variant &a, const Variant &b);
+bool operator!=(const Variant &a, const Variant &b);
 
 } // namespace ss

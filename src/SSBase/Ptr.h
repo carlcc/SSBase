@@ -146,6 +146,8 @@ private:
 
     template <class P> friend class SharedPtr;
     template <class P> friend class WeakPtr;
+    template <class Q, class P> friend bool operator==(const SharedPtr<Q> &t, const SharedPtr<P> &p);
+    template <class Q, class P> friend bool operator!=(const SharedPtr<Q> &t, const SharedPtr<P> &p);
 };
 
 template <class T> class WeakPtr
@@ -261,6 +263,8 @@ private:
 private:
     RefCounted::RefCounter *refCounter_;
     template <class P> friend class WeakPtr;
+    template <class Q, class P> friend bool operator!=(const WeakPtr<Q> &t, const WeakPtr<P> &p);
+    template <class Q, class P> friend bool operator!=(const WeakPtr<Q> &t, const WeakPtr<P> &p);
 };
 
 template <class T, class P> inline bool operator==(const SharedPtr<T> &t, const SharedPtr<P> &p)

@@ -61,6 +61,10 @@ bool test()
     SSASSERT(c3.IsInstanceOf<Child3>());
     SSASSERT(c3.IsInstanceOf<ss::Object>());
 
+    ss::Object* obj = &c3;
+    SSASSERT(ss::Object::DynamicCast<Child>(obj) == nullptr);
+    SSASSERT(ss::Object::DynamicCast<Child3>(obj) == &c3);
+
     ss::ClassDB::RegisterConstructor<Child4>();
     ss::ClassDB::Construct<Child4>();
 

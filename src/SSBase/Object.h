@@ -77,6 +77,15 @@ public:
         return Object::IsInstanceOf<clazz>(this);
     }
 
+    template <class T> static T *DynamicCast(Object *o)
+    {
+        if (Object::IsInstanceOf<T>(o))
+        {
+            return static_cast<T *>(o);
+        }
+        return nullptr;
+    }
+
 public:
 private:
     using Signal = sigslot::signal1<Variant>;

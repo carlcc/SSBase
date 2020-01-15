@@ -9,15 +9,21 @@
 #include <cstdlib>
 
 #define SSASSERT(condition)                                                                                            \
-    if (!(condition))                                                                                                  \
+    do                                                                                                                 \
     {                                                                                                                  \
-        printf("%s:%d: %s got result false. ", __FILE__, __LINE__, #condition);                                        \
-        abort();                                                                                                       \
-    }
+        if (!(condition))                                                                                              \
+        {                                                                                                              \
+            printf("%s:%d: %s got result false. ", __FILE__, __LINE__, #condition);                                    \
+            abort();                                                                                                   \
+        }                                                                                                              \
+    } while (false)
 
 #define SSASSERT2(condition, msg, ...)                                                                                 \
-    if (!(condition))                                                                                                  \
+    do                                                                                                                 \
     {                                                                                                                  \
-        printf("%s:%d: %s got result false. " msg, __FILE__, __LINE__, #condition, ##__VA_ARGS__);                     \
-        abort();                                                                                                       \
-    }
+        if (!(condition))                                                                                              \
+        {                                                                                                              \
+            printf("%s:%d: %s got result false. " msg, __FILE__, __LINE__, #condition, ##__VA_ARGS__);                 \
+            abort();                                                                                                   \
+        }                                                                                                              \
+    } while (false)

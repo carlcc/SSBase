@@ -58,6 +58,8 @@ void test_refcounter()
             ss::SharedPtr<Child> c = new Child("OBject2");
             b = c;
             wb = b;
+
+            std::cout << "b == c " << (b == c) << std::endl;
         }
         // compile error
         // ss::SharedPtr<D> d = new D;
