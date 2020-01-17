@@ -4,23 +4,27 @@
 
 #pragma once
 
-#include "Color.h"
-#include "LinearMath.h"
-#include "Ptr.h"
 #include <cstdint>
 #include <map>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+#include "Color.h"
+#include "LinearMath.h"
+#include "Ptr.h"
+
 namespace ss
 {
 
 class Variant
 {
+public:
     using String = std::string;
     using Map = std::map<std::string, Variant>;
     using Vector = std::vector<Variant>;
+
+private:
     union Value {
         int int_;
         int64_t int64_;
@@ -565,6 +569,105 @@ public:
         return value_.map_;
     }
 
+    template <class T> T Get();
+
+    template <> int Get()
+    {
+        return GetInt();
+    }
+    template <> int64_t Get()
+    {
+        return GetInt64();
+    }
+    template <> float Get()
+    {
+        return GetFloat();
+    }
+    template <> double Get()
+    {
+        return GetDouble();
+    }
+    template <> bool Get()
+    {
+        return GetBool();
+    }
+    template <> String Get()
+    {
+        return GetString();
+    }
+    template <> Color Get()
+    {
+        return GetColor();
+    }
+    template <> Quaternion Get()
+    {
+        return GetQuaternion();
+    }
+    template <> Vector2 Get()
+    {
+        return GetVector2f();
+    }
+    template <> Vector3 Get()
+    {
+        return GetVector3f();
+    }
+    template <> Vector4 Get()
+    {
+        return GetVector4f();
+    }
+    template <> Vector2i Get()
+    {
+        return GetVector2i();
+    }
+    template <> Vector3i Get()
+    {
+        return GetVector3i();
+    }
+    template <> Vector4i Get()
+    {
+        return GetVector4i();
+    }
+    template <> Matrix2 Get()
+    {
+        return GetMatrix2f();
+    }
+    template <> Matrix3 Get()
+    {
+        return GetMatrix3f();
+    }
+    template <> Matrix4 Get()
+    {
+        return GetMatrix4f();
+    }
+    template <> Matrix2i Get()
+    {
+        return GetMatrix2i();
+    }
+    template <> Matrix3i Get()
+    {
+        return GetMatrix3i();
+    }
+    template <> Matrix4i Get()
+    {
+        return GetMatrix4i();
+    }
+    template <> SharedPtr<RefCounted> Get()
+    {
+        return GetPtr();
+    }
+    template <> void *Get()
+    {
+        return GetRawPtr();
+    }
+    template <> Vector &Get()
+    {
+        return GetVector();
+    }
+    template <> Map &Get()
+    {
+        return GetMap();
+    }
+
 private:
     void SetType(Type t);
 
@@ -578,5 +681,99 @@ private:
 
 bool operator==(const Variant &a, const Variant &b);
 bool operator!=(const Variant &a, const Variant &b);
+
+template <class T> static Variant::Type GetVariantType();
+template <> static Variant::Type GetVariantType<int64_t>()
+{
+    return Variant::kTypeInt;
+}
+template <> static Variant::Type GetVariantType<float>()
+{
+    return Variant::kTypeInt64;
+}
+template <> static Variant::Type GetVariantType<double>()
+{
+    return Variant::kTypeFloat;
+}
+template <> static Variant::Type GetVariantType<bool>()
+{
+    return Variant::kTypeDouble;
+}
+template <> static Variant::Type GetVariantType<Variant::String>()
+{
+    return Variant::kTypeBool;
+}
+template <> static Variant::Type GetVariantType<Color>()
+{
+    return Variant::kTypeString;
+}
+template <> static Variant::Type GetVariantType<Quaternion>()
+{
+    return Variant::kTypeColor;
+}
+template <> static Variant::Type GetVariantType<Vector2>()
+{
+    return Variant::kTypeQuaternion;
+}
+template <> static Variant::Type GetVariantType<Vector3>()
+{
+    return Variant::kTypeVector2f;
+}
+template <> static Variant::Type GetVariantType<Vector4>()
+{
+    return Variant::kTypeVector3f;
+}
+template <> static Variant::Type GetVariantType<Vector2i>()
+{
+    return Variant::kTypeVector4f;
+}
+template <> static Variant::Type GetVariantType<Vector3i>()
+{
+    return Variant::kTypeVector2i;
+}
+template <> static Variant::Type GetVariantType<Vector4i>()
+{
+    return Variant::kTypeVector3i;
+}
+template <> static Variant::Type GetVariantType<Matrix2>()
+{
+    return Variant::kTypeVector4i;
+}
+template <> static Variant::Type GetVariantType<Matrix3>()
+{
+    return Variant::kTypeMatrix2f;
+}
+template <> static Variant::Type GetVariantType<Matrix4>()
+{
+    return Variant::kTypeMatrix3f;
+}
+template <> static Variant::Type GetVariantType<Matrix2i>()
+{
+    return Variant::kTypeMatrix4f;
+}
+template <> static Variant::Type GetVariantType<Matrix3i>()
+{
+    return Variant::kTypeMatrix2i;
+}
+template <> static Variant::Type GetVariantType<Matrix4i>()
+{
+    return Variant::kTypeMatrix3i;
+}
+template <> static Variant::Type GetVariantType<SharedPtr<RefCounted>>()
+{
+    return Variant::kTypeMatrix4i;
+}
+template <> static Variant::Type GetVariantType<void *>()
+{
+    return Variant::kTypePtr;
+}
+template <> static Variant::Type GetVariantType<Variant::Vector>()
+{
+    return Variant::kTypeRawPtr;
+}
+template <> static Variant::Type GetVariantType<Variant::Map>()
+{
+    return Variant::kTypeVector;
+}
 
 } // namespace ss

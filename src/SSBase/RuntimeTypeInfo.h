@@ -49,17 +49,31 @@ private:
     Setter setter_;
 };
 
+template <class ClassType, class Getter, class Setter>
+class SharedPtr<PropertyAccessor> MakePropertyAccessor(Getter getFunction, Setter setFunction)
+{
+    return SharedPtr<PropertyAccessor>(new PropertyAccessorImpl<ClassType, Getter, Setter>(getFunction, setFunction));
+}
+
 class Property
 {
+    enum Flag
+    {
+        kFlagNone = 0,
+    };
     std::string name_;
     Variant::Type type;
     SharedPtr<PropertyAccessor> accessor_;
+    int32_t flags;
 };
+
+using PropertyMap = std::map<std::string, Property>;
 
 struct RuntimeTypeInfo
 {
     const char *name;
     const RuntimeTypeInfo *parent;
+    const PropertyMap &(*GetAllProperties)();
 };
 
 template <class T> struct RuntimeTypeInfoImpl : public RuntimeTypeInfo

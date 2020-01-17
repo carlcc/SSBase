@@ -30,7 +30,29 @@ public:                                                                         
     const ss::RuntimeTypeInfo *GetTypeInfo() override                                                                  \
     {                                                                                                                  \
         return clazz::GetTypeInfoStatic();                                                                             \
+    }                                                                                                                  \
+    static const ss::PropertyMap &GetAllProperties()                                                                   \
+    {                                                                                                                  \
+        static struct PropertyMapLoader                                                                                \
+        {                                                                                                              \
+            PropertyMapLoader() : propertyMap_(clazz::RegisterProperties())                                            \
+            {                                                                                                          \
+            }                                                                                                          \
+            ss::PropertyMap propertyMap_;                                                                              \
+        } sPropertyMap;                                                                                                \
+        return sPropertyMap.propertyMap_;                                                                              \
     }
+
+#define SS_BEGIN_REGISTER_PROPERTIES() ss::PropertyMap propertyMap
+
+#define SS_END_REGISTER_PROPERTIES() return propertyMap
+
+#define SS_REGISTER_PROPERTY_GET_SET(propName, propType, propGetter, propSetter, flags)                                \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        SharedPtr<PropertyAccessor> accessor = ss::MakePropertyAccessor(propType, propGetter, propSetter);             \
+        propertyMap.insert({propName, Variant::GetVariantType<propType>(), accessor, flags});                          \
+    } while (false)
 
 class Object : public RefCounted
 {
@@ -42,7 +64,7 @@ public:
 
     static const RuntimeTypeInfo *GetTypeInfoStatic()
     {
-        static ss::RuntimeTypeInfo runtimeTypeInfo{"Object", nullptr};
+        static ss::RuntimeTypeInfo runtimeTypeInfo{"Object", nullptr, Object::GetAllProperties};
         return &runtimeTypeInfo;
     }
 
@@ -54,6 +76,25 @@ public:
     virtual const ss::RuntimeTypeInfo *GetTypeInfo()
     {
         return Object::GetTypeInfoStatic();
+    }
+
+    static const PropertyMap &GetAllProperties()
+    {
+        static struct PropertyMapLoader
+        {
+            PropertyMapLoader() : propertyMap_(Object::RegisterProperties())
+            {
+            }
+            std::map<std::string, Property> propertyMap_;
+        } sPropertyMap;
+        return sPropertyMap.propertyMap_;
+    }
+
+protected:
+    static PropertyMap RegisterProperties()
+    {
+        SS_BEGIN_REGISTER_PROPERTIES();
+        SS_END_REGISTER_PROPERTIES();
     }
 
 public:
