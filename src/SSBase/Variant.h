@@ -692,175 +692,6 @@ public:
 
     template <class T> struct Getter;
 
-    template <> struct Getter<int>
-    {
-        static int Get(const Variant &v)
-        {
-            return v.GetInt();
-        }
-    };
-    template <> struct Getter<int64_t>
-    {
-        static int64_t Get(const Variant &v)
-        {
-            return v.GetInt64();
-        }
-    };
-    template <> struct Getter<float>
-    {
-        static float Get(const Variant &v)
-        {
-            return v.GetFloat();
-        }
-    };
-    template <> struct Getter<double>
-    {
-        static double Get(const Variant &v)
-        {
-            return v.GetDouble();
-        }
-    };
-    template <> struct Getter<bool>
-    {
-        static bool Get(const Variant &v)
-        {
-            return v.GetBool();
-        }
-    };
-    template <> struct Getter<String>
-    {
-        static const String &Get(const Variant &v)
-        {
-            return v.GetString();
-        }
-    };
-    template <> struct Getter<Color>
-    {
-        static const Color &Get(const Variant &v)
-        {
-            return v.GetColor();
-        }
-    };
-    template <> struct Getter<Quaternion>
-    {
-        static const Quaternion &Get(const Variant &v)
-        {
-            return v.GetQuaternion();
-        }
-    };
-    template <> struct Getter<Vector2>
-    {
-        static const Vector2 &Get(const Variant &v)
-        {
-            return v.GetVector2f();
-        }
-    };
-    template <> struct Getter<Vector3>
-    {
-        static const Vector3 &Get(const Variant &v)
-        {
-            return v.GetVector3f();
-        }
-    };
-    template <> struct Getter<Vector4>
-    {
-        static const Vector4 &Get(const Variant &v)
-        {
-            return v.GetVector4f();
-        }
-    };
-    template <> struct Getter<Vector2i>
-    {
-        static const Vector2i &Get(const Variant &v)
-        {
-            return v.GetVector2i();
-        }
-    };
-    template <> struct Getter<Vector3i>
-    {
-        static const Vector3i &Get(const Variant &v)
-        {
-            return v.GetVector3i();
-        }
-    };
-    template <> struct Getter<Vector4i>
-    {
-        static const Vector4i &Get(const Variant &v)
-        {
-            return v.GetVector4i();
-        }
-    };
-    template <> struct Getter<Matrix2>
-    {
-        static const Matrix2 &Get(const Variant &v)
-        {
-            return v.GetMatrix2f();
-        }
-    };
-    template <> struct Getter<Matrix3>
-    {
-        static const Matrix3 &Get(const Variant &v)
-        {
-            return v.GetMatrix3f();
-        }
-    };
-    template <> struct Getter<Matrix4>
-    {
-        static const Matrix4 &Get(const Variant &v)
-        {
-            return v.GetMatrix4f();
-        }
-    };
-    template <> struct Getter<Matrix2i>
-    {
-        static const Matrix2i &Get(const Variant &v)
-        {
-            return v.GetMatrix2i();
-        }
-    };
-    template <> struct Getter<Matrix3i>
-    {
-        static const Matrix3i &Get(const Variant &v)
-        {
-            return v.GetMatrix3i();
-        }
-    };
-    template <> struct Getter<Matrix4i>
-    {
-        static const Matrix4i &Get(const Variant &v)
-        {
-            return v.GetMatrix4i();
-        }
-    };
-    template <> struct Getter<SharedPtr<RefCounted>>
-    {
-        static SharedPtr<RefCounted> Get(const Variant &v)
-        {
-            return v.GetPtr();
-        }
-    };
-    template <> struct Getter<void *>
-    {
-        static const void *Get(const Variant &v)
-        {
-            return v.GetRawPtr();
-        }
-    };
-    template <> struct Getter<Vector>
-    {
-        static const Vector &Get(const Variant &v)
-        {
-            return v.GetVector();
-        }
-    };
-    template <> struct Getter<Map>
-    {
-        static const Map &Get(const Variant &v)
-        {
-            return v.GetMap();
-        }
-    };
-
 private:
     void SetType(Type t);
 
@@ -870,6 +701,175 @@ private:
 
     friend bool operator==(const Variant &a, const Variant &b);
     friend bool operator!=(const Variant &a, const Variant &b);
+};
+
+template <> struct Variant::Getter<int>
+{
+    static int Get(const Variant &v)
+    {
+        return v.GetInt();
+    }
+};
+template <> struct Variant::Getter<int64_t>
+{
+    static int64_t Get(const Variant &v)
+    {
+        return v.GetInt64();
+    }
+};
+template <> struct Variant::Getter<float>
+{
+    static float Get(const Variant &v)
+    {
+        return v.GetFloat();
+    }
+};
+template <> struct Variant::Getter<double>
+{
+    static double Get(const Variant &v)
+    {
+        return v.GetDouble();
+    }
+};
+template <> struct Variant::Getter<bool>
+{
+    static bool Get(const Variant &v)
+    {
+        return v.GetBool();
+    }
+};
+template <> struct Variant::Getter<Variant::String>
+{
+    static const Variant::String &Get(const Variant &v)
+    {
+        return v.GetString();
+    }
+};
+template <> struct Variant::Getter<Color>
+{
+    static const Color &Get(const Variant &v)
+    {
+        return v.GetColor();
+    }
+};
+template <> struct Variant::Getter<Quaternion>
+{
+    static const Quaternion &Get(const Variant &v)
+    {
+        return v.GetQuaternion();
+    }
+};
+template <> struct Variant::Getter<Vector2>
+{
+    static const Vector2 &Get(const Variant &v)
+    {
+        return v.GetVector2f();
+    }
+};
+template <> struct Variant::Getter<Vector3>
+{
+    static const Vector3 &Get(const Variant &v)
+    {
+        return v.GetVector3f();
+    }
+};
+template <> struct Variant::Getter<Vector4>
+{
+    static const Vector4 &Get(const Variant &v)
+    {
+        return v.GetVector4f();
+    }
+};
+template <> struct Variant::Getter<Vector2i>
+{
+    static const Vector2i &Get(const Variant &v)
+    {
+        return v.GetVector2i();
+    }
+};
+template <> struct Variant::Getter<Vector3i>
+{
+    static const Vector3i &Get(const Variant &v)
+    {
+        return v.GetVector3i();
+    }
+};
+template <> struct Variant::Getter<Vector4i>
+{
+    static const Vector4i &Get(const Variant &v)
+    {
+        return v.GetVector4i();
+    }
+};
+template <> struct Variant::Getter<Matrix2>
+{
+    static const Matrix2 &Get(const Variant &v)
+    {
+        return v.GetMatrix2f();
+    }
+};
+template <> struct Variant::Getter<Matrix3>
+{
+    static const Matrix3 &Get(const Variant &v)
+    {
+        return v.GetMatrix3f();
+    }
+};
+template <> struct Variant::Getter<Matrix4>
+{
+    static const Matrix4 &Get(const Variant &v)
+    {
+        return v.GetMatrix4f();
+    }
+};
+template <> struct Variant::Getter<Matrix2i>
+{
+    static const Matrix2i &Get(const Variant &v)
+    {
+        return v.GetMatrix2i();
+    }
+};
+template <> struct Variant::Getter<Matrix3i>
+{
+    static const Matrix3i &Get(const Variant &v)
+    {
+        return v.GetMatrix3i();
+    }
+};
+template <> struct Variant::Getter<Matrix4i>
+{
+    static const Matrix4i &Get(const Variant &v)
+    {
+        return v.GetMatrix4i();
+    }
+};
+template <> struct Variant::Getter<SharedPtr<RefCounted>>
+{
+    static SharedPtr<RefCounted> Get(const Variant &v)
+    {
+        return v.GetPtr();
+    }
+};
+template <> struct Variant::Getter<void *>
+{
+    static const void *Get(const Variant &v)
+    {
+        return v.GetRawPtr();
+    }
+};
+template <> struct Variant::Getter<Variant::Vector>
+{
+    static const Variant::Vector &Get(const Variant &v)
+    {
+        return v.GetVector();
+    }
+};
+template <> struct Variant::Getter<Variant::Map>
+{
+    static const Variant::Map &Get(const Variant &v)
+    {
+        return v.GetMap();
+    }
 };
 
 bool operator==(const Variant &a, const Variant &b);
