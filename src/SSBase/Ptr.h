@@ -5,6 +5,7 @@
 #pragma once
 
 #include "RefCounted.h"
+#include <memory>
 
 namespace ss
 {
@@ -315,6 +316,11 @@ template <class T, class P> inline bool operator==(const WeakPtr<T> &t, const We
 template <class T, class P> inline bool operator!=(const WeakPtr<T> &t, const WeakPtr<P> &p)
 {
     return t.refCounter_ != p.refCounter_;
+}
+
+template <class T, class... Args> inline SharedPtr<T> MakeShared(Args &&... args)
+{
+    return SharedPtr<T>(new T(std::forward<Args>(args)...));
 }
 
 } // namespace ss

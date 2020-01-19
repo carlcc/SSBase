@@ -473,77 +473,77 @@ public:
         SSASSERT(type_ == kTypeBool);
         return value_.bool_;
     }
-    String GetString() const
+    const String &GetString() const
     {
         SSASSERT(type_ == kTypeString);
         return value_.string_;
     }
-    Color GetColor() const
+    const Color &GetColor() const
     {
         SSASSERT(type_ == kTypeColor);
         return value_.color_;
     }
-    Quaternion GetQuaternion() const
+    const Quaternion &GetQuaternion() const
     {
         SSASSERT(type_ == kTypeQuaternion);
         return value_.quaternion_;
     }
-    Vector2 GetVector2f() const
+    const Vector2 &GetVector2f() const
     {
         SSASSERT(type_ == kTypeVector2f);
         return value_.vector2_;
     }
-    Vector3 GetVector3f() const
+    const Vector3 &GetVector3f() const
     {
         SSASSERT(type_ == kTypeVector3f);
         return value_.vector3_;
     }
-    Vector4 GetVector4f() const
+    const Vector4 &GetVector4f() const
     {
         SSASSERT(type_ == kTypeVector4f);
         return value_.vector4_;
     }
-    Vector2i GetVector2i() const
+    const Vector2i &GetVector2i() const
     {
         SSASSERT(type_ == kTypeVector2i);
         return value_.vector2i_;
     }
-    Vector3i GetVector3i() const
+    const Vector3i &GetVector3i() const
     {
         SSASSERT(type_ == kTypeVector3i);
         return value_.vector3i_;
     }
-    Vector4i GetVector4i() const
+    const Vector4i &GetVector4i() const
     {
         SSASSERT(type_ == kTypeVector4i);
         return value_.vector4i_;
     }
-    Matrix2 GetMatrix2f() const
+    const Matrix2 &GetMatrix2f() const
     {
         SSASSERT(type_ == kTypeMatrix2f);
         return value_.matrix2_;
     }
-    Matrix3 GetMatrix3f() const
+    const Matrix3 &GetMatrix3f() const
     {
         SSASSERT(type_ == kTypeMatrix3f);
         return value_.matrix3_;
     }
-    Matrix4 GetMatrix4f() const
+    const Matrix4 &GetMatrix4f() const
     {
         SSASSERT(type_ == kTypeMatrix4f);
         return value_.matrix4_;
     }
-    Matrix2i GetMatrix2i() const
+    const Matrix2i &GetMatrix2i() const
     {
         SSASSERT(type_ == kTypeMatrix2i);
         return value_.matrix2i_;
     }
-    Matrix3i GetMatrix3i() const
+    const Matrix3i &GetMatrix3i() const
     {
         SSASSERT(type_ == kTypeMatrix3i);
         return value_.matrix3i_;
     }
-    Matrix4i GetMatrix4i() const
+    const Matrix4i &GetMatrix4i() const
     {
         SSASSERT(type_ == kTypeMatrix4i);
         return value_.matrix4i_;
@@ -554,6 +554,127 @@ public:
         return value_.ptr_;
     }
     void *GetRawPtr() const
+    {
+        SSASSERT(type_ == kTypeRawPtr);
+        return value_.rawPtr_;
+    }
+    const Vector &GetVector() const
+    {
+        SSASSERT(type_ == kTypeVector);
+        return value_.vector_;
+    }
+    const Map &GetMap() const
+    {
+        SSASSERT(type_ == kTypeMap);
+        return value_.map_;
+    }
+
+    int &GetInt()
+    {
+        SSASSERT(type_ == kTypeInt);
+        return value_.int_;
+    }
+    int64_t &GetInt64()
+    {
+        SSASSERT(type_ == kTypeInt64);
+        return value_.int64_;
+    }
+    float &GetFloat()
+    {
+        SSASSERT(type_ == kTypeFloat);
+        return value_.float_;
+    }
+    double &GetDouble()
+    {
+        SSASSERT(type_ == kTypeDouble);
+        return value_.double_;
+    }
+    bool &GetBool()
+    {
+        SSASSERT(type_ == kTypeBool);
+        return value_.bool_;
+    }
+    String &GetString()
+    {
+        SSASSERT(type_ == kTypeString);
+        return value_.string_;
+    }
+    Color &GetColor()
+    {
+        SSASSERT(type_ == kTypeColor);
+        return value_.color_;
+    }
+    Quaternion &GetQuaternion()
+    {
+        SSASSERT(type_ == kTypeQuaternion);
+        return value_.quaternion_;
+    }
+    Vector2 &GetVector2f()
+    {
+        SSASSERT(type_ == kTypeVector2f);
+        return value_.vector2_;
+    }
+    Vector3 &GetVector3f()
+    {
+        SSASSERT(type_ == kTypeVector3f);
+        return value_.vector3_;
+    }
+    Vector4 &GetVector4f()
+    {
+        SSASSERT(type_ == kTypeVector4f);
+        return value_.vector4_;
+    }
+    Vector2i &GetVector2i()
+    {
+        SSASSERT(type_ == kTypeVector2i);
+        return value_.vector2i_;
+    }
+    Vector3i &GetVector3i()
+    {
+        SSASSERT(type_ == kTypeVector3i);
+        return value_.vector3i_;
+    }
+    Vector4i &GetVector4i()
+    {
+        SSASSERT(type_ == kTypeVector4i);
+        return value_.vector4i_;
+    }
+    Matrix2 &GetMatrix2f()
+    {
+        SSASSERT(type_ == kTypeMatrix2f);
+        return value_.matrix2_;
+    }
+    Matrix3 &GetMatrix3f()
+    {
+        SSASSERT(type_ == kTypeMatrix3f);
+        return value_.matrix3_;
+    }
+    Matrix4 &GetMatrix4f()
+    {
+        SSASSERT(type_ == kTypeMatrix4f);
+        return value_.matrix4_;
+    }
+    Matrix2i &GetMatrix2i()
+    {
+        SSASSERT(type_ == kTypeMatrix2i);
+        return value_.matrix2i_;
+    }
+    Matrix3i &GetMatrix3i()
+    {
+        SSASSERT(type_ == kTypeMatrix3i);
+        return value_.matrix3i_;
+    }
+    Matrix4i &GetMatrix4i()
+    {
+        SSASSERT(type_ == kTypeMatrix4i);
+        return value_.matrix4i_;
+    }
+    SharedPtr<RefCounted> &GetPtr()
+    {
+        SSASSERT(type_ == kTypePtr);
+        return value_.ptr_;
+    }
+    void *&GetRawPtr()
     {
         SSASSERT(type_ == kTypeRawPtr);
         return value_.rawPtr_;
@@ -569,104 +690,176 @@ public:
         return value_.map_;
     }
 
-    template <class T> T Get();
+    template <class T> struct Getter;
 
-    template <> int Get()
+    template <> struct Getter<int>
     {
-        return GetInt();
-    }
-    template <> int64_t Get()
+        static int Get(const Variant &v)
+        {
+            return v.GetInt();
+        }
+    };
+    template <> struct Getter<int64_t>
     {
-        return GetInt64();
-    }
-    template <> float Get()
+        static int64_t Get(const Variant &v)
+        {
+            return v.GetInt64();
+        }
+    };
+    template <> struct Getter<float>
     {
-        return GetFloat();
-    }
-    template <> double Get()
+        static float Get(const Variant &v)
+        {
+            return v.GetFloat();
+        }
+    };
+    template <> struct Getter<double>
     {
-        return GetDouble();
-    }
-    template <> bool Get()
+        static double Get(const Variant &v)
+        {
+            return v.GetDouble();
+        }
+    };
+    template <> struct Getter<bool>
     {
-        return GetBool();
-    }
-    template <> String Get()
+        static bool Get(const Variant &v)
+        {
+            return v.GetBool();
+        }
+    };
+    template <> struct Getter<String>
     {
-        return GetString();
-    }
-    template <> Color Get()
+        static const String &Get(const Variant &v)
+        {
+            return v.GetString();
+        }
+    };
+    template <> struct Getter<Color>
     {
-        return GetColor();
-    }
-    template <> Quaternion Get()
+        static const Color &Get(const Variant &v)
+        {
+            return v.GetColor();
+        }
+    };
+    template <> struct Getter<Quaternion>
     {
-        return GetQuaternion();
-    }
-    template <> Vector2 Get()
+        static const Quaternion &Get(const Variant &v)
+        {
+            return v.GetQuaternion();
+        }
+    };
+    template <> struct Getter<Vector2>
     {
-        return GetVector2f();
-    }
-    template <> Vector3 Get()
+        static const Vector2 &Get(const Variant &v)
+        {
+            return v.GetVector2f();
+        }
+    };
+    template <> struct Getter<Vector3>
     {
-        return GetVector3f();
-    }
-    template <> Vector4 Get()
+        static const Vector3 &Get(const Variant &v)
+        {
+            return v.GetVector3f();
+        }
+    };
+    template <> struct Getter<Vector4>
     {
-        return GetVector4f();
-    }
-    template <> Vector2i Get()
+        static const Vector4 &Get(const Variant &v)
+        {
+            return v.GetVector4f();
+        }
+    };
+    template <> struct Getter<Vector2i>
     {
-        return GetVector2i();
-    }
-    template <> Vector3i Get()
+        static const Vector2i &Get(const Variant &v)
+        {
+            return v.GetVector2i();
+        }
+    };
+    template <> struct Getter<Vector3i>
     {
-        return GetVector3i();
-    }
-    template <> Vector4i Get()
+        static const Vector3i &Get(const Variant &v)
+        {
+            return v.GetVector3i();
+        }
+    };
+    template <> struct Getter<Vector4i>
     {
-        return GetVector4i();
-    }
-    template <> Matrix2 Get()
+        static const Vector4i &Get(const Variant &v)
+        {
+            return v.GetVector4i();
+        }
+    };
+    template <> struct Getter<Matrix2>
     {
-        return GetMatrix2f();
-    }
-    template <> Matrix3 Get()
+        static const Matrix2 &Get(const Variant &v)
+        {
+            return v.GetMatrix2f();
+        }
+    };
+    template <> struct Getter<Matrix3>
     {
-        return GetMatrix3f();
-    }
-    template <> Matrix4 Get()
+        static const Matrix3 &Get(const Variant &v)
+        {
+            return v.GetMatrix3f();
+        }
+    };
+    template <> struct Getter<Matrix4>
     {
-        return GetMatrix4f();
-    }
-    template <> Matrix2i Get()
+        static const Matrix4 &Get(const Variant &v)
+        {
+            return v.GetMatrix4f();
+        }
+    };
+    template <> struct Getter<Matrix2i>
     {
-        return GetMatrix2i();
-    }
-    template <> Matrix3i Get()
+        static const Matrix2i &Get(const Variant &v)
+        {
+            return v.GetMatrix2i();
+        }
+    };
+    template <> struct Getter<Matrix3i>
     {
-        return GetMatrix3i();
-    }
-    template <> Matrix4i Get()
+        static const Matrix3i &Get(const Variant &v)
+        {
+            return v.GetMatrix3i();
+        }
+    };
+    template <> struct Getter<Matrix4i>
     {
-        return GetMatrix4i();
-    }
-    template <> SharedPtr<RefCounted> Get()
+        static const Matrix4i &Get(const Variant &v)
+        {
+            return v.GetMatrix4i();
+        }
+    };
+    template <> struct Getter<SharedPtr<RefCounted>>
     {
-        return GetPtr();
-    }
-    template <> void *Get()
+        static SharedPtr<RefCounted> Get(const Variant &v)
+        {
+            return v.GetPtr();
+        }
+    };
+    template <> struct Getter<void *>
     {
-        return GetRawPtr();
-    }
-    template <> Vector &Get()
+        static const void *Get(const Variant &v)
+        {
+            return v.GetRawPtr();
+        }
+    };
+    template <> struct Getter<Vector>
     {
-        return GetVector();
-    }
-    template <> Map &Get()
+        static const Vector &Get(const Variant &v)
+        {
+            return v.GetVector();
+        }
+    };
+    template <> struct Getter<Map>
     {
-        return GetMap();
-    }
+        static const Map &Get(const Variant &v)
+        {
+            return v.GetMap();
+        }
+    };
 
 private:
     void SetType(Type t);
@@ -682,98 +875,117 @@ private:
 bool operator==(const Variant &a, const Variant &b);
 bool operator!=(const Variant &a, const Variant &b);
 
-template <class T> static Variant::Type GetVariantType();
-template <> static Variant::Type GetVariantType<int64_t>()
+template <class T> inline Variant::Type GetVariantType();
+template <> inline Variant::Type GetVariantType<int>()
 {
     return Variant::kTypeInt;
 }
-template <> static Variant::Type GetVariantType<float>()
+template <> inline Variant::Type GetVariantType<int64_t>()
 {
     return Variant::kTypeInt64;
 }
-template <> static Variant::Type GetVariantType<double>()
+template <> inline Variant::Type GetVariantType<float>()
 {
     return Variant::kTypeFloat;
 }
-template <> static Variant::Type GetVariantType<bool>()
+template <> inline Variant::Type GetVariantType<double>()
 {
     return Variant::kTypeDouble;
 }
-template <> static Variant::Type GetVariantType<Variant::String>()
+template <> inline Variant::Type GetVariantType<bool>()
 {
     return Variant::kTypeBool;
 }
-template <> static Variant::Type GetVariantType<Color>()
+template <> inline Variant::Type GetVariantType<Variant::String>()
 {
     return Variant::kTypeString;
 }
-template <> static Variant::Type GetVariantType<Quaternion>()
+template <> inline Variant::Type GetVariantType<Variant::String &>()
+{
+    return Variant::kTypeString;
+}
+template <> inline Variant::Type GetVariantType<Color>()
 {
     return Variant::kTypeColor;
 }
-template <> static Variant::Type GetVariantType<Vector2>()
+template <> inline Variant::Type GetVariantType<Quaternion>()
 {
     return Variant::kTypeQuaternion;
 }
-template <> static Variant::Type GetVariantType<Vector3>()
+template <> inline Variant::Type GetVariantType<Vector2>()
 {
     return Variant::kTypeVector2f;
 }
-template <> static Variant::Type GetVariantType<Vector4>()
+template <> inline Variant::Type GetVariantType<Vector3>()
 {
     return Variant::kTypeVector3f;
 }
-template <> static Variant::Type GetVariantType<Vector2i>()
+template <> inline Variant::Type GetVariantType<Vector4>()
 {
     return Variant::kTypeVector4f;
 }
-template <> static Variant::Type GetVariantType<Vector3i>()
+template <> inline Variant::Type GetVariantType<Vector2i>()
 {
     return Variant::kTypeVector2i;
 }
-template <> static Variant::Type GetVariantType<Vector4i>()
+template <> inline Variant::Type GetVariantType<Vector3i>()
 {
     return Variant::kTypeVector3i;
 }
-template <> static Variant::Type GetVariantType<Matrix2>()
+template <> inline Variant::Type GetVariantType<Vector4i>()
 {
     return Variant::kTypeVector4i;
 }
-template <> static Variant::Type GetVariantType<Matrix3>()
+template <> inline Variant::Type GetVariantType<Matrix2>()
 {
     return Variant::kTypeMatrix2f;
 }
-template <> static Variant::Type GetVariantType<Matrix4>()
+template <> inline Variant::Type GetVariantType<Matrix3>()
 {
     return Variant::kTypeMatrix3f;
 }
-template <> static Variant::Type GetVariantType<Matrix2i>()
+template <> inline Variant::Type GetVariantType<Matrix4>()
 {
     return Variant::kTypeMatrix4f;
 }
-template <> static Variant::Type GetVariantType<Matrix3i>()
+template <> inline Variant::Type GetVariantType<Matrix2i>()
 {
     return Variant::kTypeMatrix2i;
 }
-template <> static Variant::Type GetVariantType<Matrix4i>()
+template <> inline Variant::Type GetVariantType<Matrix3i>()
 {
     return Variant::kTypeMatrix3i;
 }
-template <> static Variant::Type GetVariantType<SharedPtr<RefCounted>>()
+template <> inline Variant::Type GetVariantType<Matrix4i>()
 {
     return Variant::kTypeMatrix4i;
 }
-template <> static Variant::Type GetVariantType<void *>()
+template <> inline Variant::Type GetVariantType<SharedPtr<RefCounted>>()
 {
     return Variant::kTypePtr;
 }
-template <> static Variant::Type GetVariantType<Variant::Vector>()
+template <> inline Variant::Type GetVariantType<void *>()
 {
     return Variant::kTypeRawPtr;
 }
-template <> static Variant::Type GetVariantType<Variant::Map>()
+template <> inline Variant::Type GetVariantType<Variant::Vector>()
 {
     return Variant::kTypeVector;
 }
+template <> inline Variant::Type GetVariantType<Variant::Vector &>()
+{
+    return Variant::kTypeVector;
+}
+template <> inline Variant::Type GetVariantType<Variant::Map>()
+{
+    return Variant::kTypeMap;
+}
+template <> inline Variant::Type GetVariantType<Variant::Map &>()
+{
+    return Variant::kTypeMap;
+}
+
+using VariantMap = Variant::Map;
+using VariantVector = Variant::Vector;
 
 } // namespace ss

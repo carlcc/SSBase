@@ -8,11 +8,16 @@
 #include "RuntimeTypeInfo.h"
 #include "Variant.h"
 #include "thirdparty/sigslot.h"
+#include <map>
 
 namespace ss
 {
 
 #define SS_OBJECT(clazz, base)                                                                                         \
+private:                                                                                                               \
+    using This = clazz;                                                                                                \
+    using Super = base;                                                                                                \
+                                                                                                                       \
 public:                                                                                                                \
     static const char *GetTypeNameStatic()                                                                             \
     {                                                                                                                  \
@@ -23,15 +28,7 @@ public:                                                                         
         static ss::RuntimeTypeInfo runtimeTypeInfo{#clazz, base::GetTypeInfoStatic()};                                 \
         return &runtimeTypeInfo;                                                                                       \
     }                                                                                                                  \
-    const char *GetTypeName() override                                                                                 \
-    {                                                                                                                  \
-        return clazz::GetTypeNameStatic();                                                                             \
-    }                                                                                                                  \
-    const ss::RuntimeTypeInfo *GetTypeInfo() override                                                                  \
-    {                                                                                                                  \
-        return clazz::GetTypeInfoStatic();                                                                             \
-    }                                                                                                                  \
-    static const ss::PropertyMap &GetAllProperties()                                                                   \
+    static const ss::PropertyMap &GetAllPropertiesStatic()                                                             \
     {                                                                                                                  \
         static struct PropertyMapLoader                                                                                \
         {                                                                                                              \
@@ -41,61 +38,50 @@ public:                                                                         
             ss::PropertyMap propertyMap_;                                                                              \
         } sPropertyMap;                                                                                                \
         return sPropertyMap.propertyMap_;                                                                              \
+    }                                                                                                                  \
+    const char *GetTypeName() override                                                                                 \
+    {                                                                                                                  \
+        return clazz::GetTypeNameStatic();                                                                             \
+    }                                                                                                                  \
+    const ss::RuntimeTypeInfo *GetTypeInfo() override                                                                  \
+    {                                                                                                                  \
+        return clazz::GetTypeInfoStatic();                                                                             \
+    }                                                                                                                  \
+    virtual const ss::PropertyMap &GetAllProperties() override                                                         \
+    {                                                                                                                  \
+        return clazz::GetAllPropertiesStatic();                                                                        \
     }
 
-#define SS_BEGIN_REGISTER_PROPERTIES() ss::PropertyMap propertyMap
+#define SS_BEGIN_REGISTER_PROPERTIES() ss::PropertyMap propertyMap = Super::GetAllPropertiesStatic()
 
 #define SS_END_REGISTER_PROPERTIES() return propertyMap
 
 #define SS_REGISTER_PROPERTY_GET_SET(propName, propType, propGetter, propSetter, flags)                                \
     do                                                                                                                 \
     {                                                                                                                  \
-        SharedPtr<PropertyAccessor> accessor = ss::MakePropertyAccessor(propType, propGetter, propSetter);             \
-        propertyMap.insert({propName, Variant::GetVariantType<propType>(), accessor, flags});                          \
+        auto accessor = ss::MakePropertyAccessor<This>(                                                                \
+            [](const This &obj, ss::Variant &v) { v = (obj.*propGetter)(); },                                          \
+            [](This &obj, const ss::Variant &v) { (obj.*propSetter)(ss::Variant::Getter<propType>::Get(v)); });        \
+        propertyMap.insert({propName, ss::Property{propName, ss::GetVariantType<propType>(), accessor, 0}});           \
     } while (false)
 
-class Object : public RefCounted
+class Object : public RefCounted, public sigslot::has_slots<>
 {
 public:
-    static const char *GetTypeNameStatic()
-    {
-        return "Object";
-    }
+    static const char *GetTypeNameStatic();
 
-    static const RuntimeTypeInfo *GetTypeInfoStatic()
-    {
-        static ss::RuntimeTypeInfo runtimeTypeInfo{"Object", nullptr, Object::GetAllProperties};
-        return &runtimeTypeInfo;
-    }
+    static const RuntimeTypeInfo *GetTypeInfoStatic();
 
-    virtual const char *GetTypeName()
-    {
-        return Object::GetTypeNameStatic();
-    }
+    static const PropertyMap &GetAllPropertiesStatic();
 
-    virtual const ss::RuntimeTypeInfo *GetTypeInfo()
-    {
-        return Object::GetTypeInfoStatic();
-    }
+    virtual const char *GetTypeName();
 
-    static const PropertyMap &GetAllProperties()
-    {
-        static struct PropertyMapLoader
-        {
-            PropertyMapLoader() : propertyMap_(Object::RegisterProperties())
-            {
-            }
-            std::map<std::string, Property> propertyMap_;
-        } sPropertyMap;
-        return sPropertyMap.propertyMap_;
-    }
+    virtual const ss::RuntimeTypeInfo *GetTypeInfo();
+
+    virtual const PropertyMap &GetAllProperties();
 
 protected:
-    static PropertyMap RegisterProperties()
-    {
-        SS_BEGIN_REGISTER_PROPERTIES();
-        SS_END_REGISTER_PROPERTIES();
-    }
+    static PropertyMap RegisterProperties();
 
 public:
     template <class clazz, class T> static bool IsInstanceOf(T *p)
@@ -128,9 +114,62 @@ public:
     }
 
 public:
+    using Signal = sigslot::signal1<VariantMap &>;
+    using SignalMap = std::map<std::string, Signal>;
+
+    const SignalMap &GetAllSignals() const
+    {
+        return signals_;
+    }
+
+    template <class T> void Connect(const std::string &signal, T *obj, void (T::*handler)(VariantMap &))
+    {
+        signals_[signal].connect(obj, handler);
+    }
+
+    template <class T> void Connect(const std::string &signal, SharedPtr<T> obj, void (T::*handler)(VariantMap &))
+    {
+        signals_[signal].connect(obj.Get(), handler);
+    }
+
+    template <class T> void Disconnect(const std::string &signal, T *obj)
+    {
+        signals_[signal].disconnect(obj);
+    }
+
+    template <class T> void Disconnect(const std::string &signal, SharedPtr<T> obj)
+    {
+        signals_[signal].disconnect(obj.Get());
+    }
+
+    void DisconnectAll(const std::string &signal);
+
+    void DisconnectAll();
+
+    void Emit(const std::string &signal, VariantMap &params);
+
+    // TODO: how to manage the dummy object's life cycle?
+    // void Connect(const std::string &signal, std::function<void(VariantMap &)> &&handler)
+    // {
+    //     struct Dummy : public sigslot::has_slots<>
+    //     {
+    //         explicit Dummy(std::function<void(VariantMap &)> &&handler)
+    //             : handler_(std::forward<std::function<void(VariantMap &)>>(handler))
+    //         {
+    //         }
+    //
+    //         void handle(VariantMap &params)
+    //         {
+    //             handler_(params);
+    //         }
+    //
+    //         std::function<void(VariantMap &)> handler_;
+    //     };
+    //     Connect(signal, new Dummy(std::forward<std::function<void(VariantMap &)>>(handler)), &Dummy::handle);
+    // }
+
 private:
-    using Signal = sigslot::signal1<Variant>;
-    Signal signals;
+    SignalMap signals_;
 };
 
 } // namespace ss

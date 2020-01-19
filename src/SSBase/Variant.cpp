@@ -39,6 +39,7 @@ void Variant::SetType(Variant::Type t)
         break;
     case Type::kTypeString:
         value_.string_.~String();
+        break;
     case Type::kTypePtr:
         value_.ptr_.~SharedPtr<RefCounted>();
         break;

@@ -5,6 +5,7 @@
 #include "testrefcounter.h"
 #include "test_reflection.h"
 #include "test_variant.h"
+#include "test_signal.h"
 
 int main()
 {
@@ -12,7 +13,9 @@ int main()
 
     TestReflection::test();
 
-    TestVariant::test();
+//    TestVariant::test();
+
+    TestSignal::test();
 
     std::cout << "end main" << std::endl;
 
