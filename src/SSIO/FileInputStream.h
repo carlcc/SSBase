@@ -33,6 +33,8 @@ public:
 
     bool IsValid() const override;
 
+    std::string ReadAll();
+
 private:
     FILE *filePtr_;
     int64_t totalFileSize_;

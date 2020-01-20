@@ -90,4 +90,12 @@ bool FileInputStream::IsValid() const
     return filePtr_ != nullptr;
 }
 
+std::string FileInputStream::ReadAll()
+{
+    std::string result;
+    result.resize(Available());
+    Read(const_cast<char*>(result.data()), result.size());
+    return result;
+}
+
 } // namespace ss

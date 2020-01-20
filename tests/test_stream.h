@@ -23,9 +23,12 @@ bool test()
         {
             auto c = fis->Read(buffer, sizeof(buffer));
             fos->Write(buffer, c);
-            // std::cout << std::string(buffer, c);
         }
     }
+
+    SharedPtr<FileInputStream> fis2 = MakeShared<FileInputStream>(__FILE__);
+    std::string code = fis2->ReadAll();
+    std::cout << code << std::endl;
 
     return true;
 }
