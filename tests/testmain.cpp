@@ -6,7 +6,7 @@
 #include "test_reflection.h"
 #include "test_variant.h"
 #include "test_signal.h"
-
+#include "test_stream.h"
 int main()
 {
 //    TestRefCount::test_refcounter();
@@ -16,6 +16,8 @@ int main()
 //    TestVariant::test();
 
     TestSignal::test();
+
+    TestStream::test();
 
     std::cout << "end main" << std::endl;
 

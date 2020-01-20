@@ -21,6 +21,7 @@ class Light : public ss::Object
 {
     SS_OBJECT(Light, ss::Object);
 
+public:
     explicit Light(int n) : n_(n)
     {
         static int counter = 1;
@@ -57,7 +58,8 @@ public:
     void handleSwitch(ss::VariantMap &params)
     {
         isOn_ = !isOn_;
-        std::cout << "Toggle fan " << (isOn_ ? "on" : "off") << ", And greetings: " << params["msg"].GetString() << std::endl;
+        std::cout << "Toggle fan " << (isOn_ ? "on" : "off") << ", And greetings: " << params["msg"].GetString()
+                  << std::endl;
     }
 
     bool isOn_{false};
@@ -75,12 +77,15 @@ bool test()
 
     ss::VariantMap params;
     params["msg"] = "'Greeting msg!'";
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 10; ++i)
+    {
         std::cout << "======" << i << std::endl;
-        if (i == 5) {
+        if (i == 5)
+        {
             switcher->Disconnect("toggle", fan);
         }
-        if (i == 6) {
+        if (i == 6)
+        {
             light2 = nullptr;
         }
         switcher->Emit("toggle", params);

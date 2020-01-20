@@ -50,7 +50,8 @@ public:                                                                         
     virtual const ss::PropertyMap &GetAllProperties() override                                                         \
     {                                                                                                                  \
         return clazz::GetAllPropertiesStatic();                                                                        \
-    }
+    }                                                                                                                  \
+private:
 
 #define SS_BEGIN_REGISTER_PROPERTIES() ss::PropertyMap propertyMap = Super::GetAllPropertiesStatic()
 
