@@ -6,10 +6,13 @@
 
 #include <SSBase/ClassDB.h>
 #include <SSBase/Object.h>
+#include <SSBase/Str.h>
+#include <sstream>
 
 namespace TestReflection
 {
 
+std::stringstream gOutput;
 class Child : public ss::Object
 {
     SS_OBJECT(Child, ss::Object)
@@ -46,7 +49,7 @@ protected:
         SS_BEGIN_REGISTER_PROPERTIES();
 
         SS_REGISTER_PROPERTY_GET_SET("IsVisible", bool, &Child2::IsVisible, &Child2::SetIsVisible, 0);
-        SS_REGISTER_PROPERTY_GET_SET("Name", std::string, &Child2::GetName, &Child2::SetName, 0);
+        SS_REGISTER_PROPERTY_GET_SET("Name", ss::String, &Child2::GetName, &Child2::SetName, 0);
 
         SS_END_REGISTER_PROPERTIES();
     }
@@ -62,12 +65,12 @@ public:
         isVisible_ = isVisible;
     }
 
-    std::string name_;
-    const std::string &GetName() const
+    ss::String name_;
+    const ss::String &GetName() const
     {
         return name_;
     }
-    void SetName(const std::string &name)
+    void SetName(const ss::String &name)
     {
         name_ = name;
     }
@@ -87,11 +90,11 @@ class Child4 : public ss::Object
 public:
     Child4()
     {
-        std::cout << "Construct child4" << std::endl;
+        gOutput << "Construct child4" << std::endl;
     }
     ~Child4()
     {
-        std::cout << "Destruct child4" << std::endl;
+        gOutput << "Destruct child4" << std::endl;
     }
 };
 
@@ -161,7 +164,7 @@ bool test()
         auto &props = Child2::GetAllPropertiesStatic();
         auto &prop = props.at("Name");
         ss::Variant v;
-        std::string name = "hello, world";
+        ss::String name = "hello, world";
         c2.SetName(name);
         prop.GetAccessor()->Get(&c2, v);
         SSASSERT(v.GetString() == name);
@@ -191,6 +194,11 @@ bool test()
 
     ss::ClassDB::RegisterConstructor<Child4>();
     ss::ClassDB::Construct<Child4>();
+
+    std::string kResult = R"(Construct child4
+Destruct child4
+)";
+    SSASSERT(gOutput.str() == kResult);
 
     return true;
 }

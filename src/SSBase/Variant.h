@@ -6,13 +6,13 @@
 
 #include <cstdint>
 #include <map>
-#include <string>
 #include <unordered_map>
 #include <vector>
 
 #include "Color.h"
 #include "LinearMath.h"
 #include "Ptr.h"
+#include "Str.h"
 
 namespace ss
 {
@@ -20,8 +20,8 @@ namespace ss
 class Variant
 {
 public:
-    using String = std::string;
-    using Map = std::map<std::string, Variant>;
+    using String = ss::String;
+    using Map = std::map<String, Variant>;
     using Vector = std::vector<Variant>;
 
 private:
@@ -133,7 +133,7 @@ public:
         *this = v;
     }
 
-    Variant(const std::string &v) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    Variant(const String &v) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
         : type_(kTypeInt), value_()
     {
         *this = v;
@@ -300,7 +300,13 @@ public:
         return *this;
     }
 
-    Variant &operator=(const std::string &v)
+    Variant &operator=(const String &v)
+    {
+        *this = (const CharSequence &)v;
+        return *this;
+    }
+
+    Variant &operator=(const CharSequence &v)
     {
         SetType(kTypeString);
         value_.string_ = v;
@@ -309,7 +315,13 @@ public:
 
     Variant &operator=(const char *v)
     {
-        *this = std::string(v);
+        *this = String(v);
+        return *this;
+    }
+
+    Variant &operator=(const wchar_t *v)
+    {
+        *this = String(v);
         return *this;
     }
 

@@ -6,16 +6,16 @@
 
 #include "Assert.h"
 #include "Property.h"
-#include <string>
+#include "Str.h"
 
 namespace ss
 {
 
-using PropertyMap = std::map<std::string, Property>;
+using PropertyMap = std::map<String, Property>;
 
 struct RuntimeTypeInfo
 {
-    const char *name;
+    const String &name;
     const RuntimeTypeInfo *parent;
     const PropertyMap &(*GetAllProperties)();
 };

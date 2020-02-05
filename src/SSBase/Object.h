@@ -19,13 +19,14 @@ private:                                                                        
     using Super = base;                                                                                                \
                                                                                                                        \
 public:                                                                                                                \
-    static const char *GetTypeNameStatic()                                                                             \
+    static const ss::String &GetTypeNameStatic()                                                                       \
     {                                                                                                                  \
-        return #clazz;                                                                                                 \
+        static ss::String name(#clazz);                                                                                \
+        return name;                                                                                                   \
     }                                                                                                                  \
     static const ss::RuntimeTypeInfo *GetTypeInfoStatic()                                                              \
     {                                                                                                                  \
-        static ss::RuntimeTypeInfo runtimeTypeInfo{#clazz, base::GetTypeInfoStatic()};                                 \
+        static ss::RuntimeTypeInfo runtimeTypeInfo{GetTypeNameStatic(), base::GetTypeInfoStatic()};                    \
         return &runtimeTypeInfo;                                                                                       \
     }                                                                                                                  \
     static const ss::PropertyMap &GetAllPropertiesStatic()                                                             \
@@ -39,7 +40,7 @@ public:                                                                         
         } sPropertyMap;                                                                                                \
         return sPropertyMap.propertyMap_;                                                                              \
     }                                                                                                                  \
-    const char *GetTypeName() override                                                                                 \
+    const ss::String &GetTypeName() override                                                                           \
     {                                                                                                                  \
         return clazz::GetTypeNameStatic();                                                                             \
     }                                                                                                                  \
@@ -51,6 +52,7 @@ public:                                                                         
     {                                                                                                                  \
         return clazz::GetAllPropertiesStatic();                                                                        \
     }                                                                                                                  \
+                                                                                                                       \
 private:
 
 #define SS_BEGIN_REGISTER_PROPERTIES() ss::PropertyMap propertyMap = Super::GetAllPropertiesStatic()
@@ -69,13 +71,13 @@ private:
 class Object : public RefCounted, public sigslot::has_slots<>
 {
 public:
-    static const char *GetTypeNameStatic();
+    static const String &GetTypeNameStatic();
 
     static const RuntimeTypeInfo *GetTypeInfoStatic();
 
     static const PropertyMap &GetAllPropertiesStatic();
 
-    virtual const char *GetTypeName();
+    virtual const String &GetTypeName();
 
     virtual const ss::RuntimeTypeInfo *GetTypeInfo();
 
@@ -116,41 +118,41 @@ public:
 
 public:
     using Signal = sigslot::signal1<VariantMap &>;
-    using SignalMap = std::map<std::string, Signal>;
+    using SignalMap = std::map<String, Signal>;
 
     const SignalMap &GetAllSignals() const
     {
         return signals_;
     }
 
-    template <class T> void Connect(const std::string &signal, T *obj, void (T::*handler)(VariantMap &))
+    template <class T> void Connect(const String &signal, T *obj, void (T::*handler)(VariantMap &))
     {
         signals_[signal].connect(obj, handler);
     }
 
-    template <class T> void Connect(const std::string &signal, SharedPtr<T> obj, void (T::*handler)(VariantMap &))
+    template <class T> void Connect(const String &signal, SharedPtr<T> obj, void (T::*handler)(VariantMap &))
     {
         signals_[signal].connect(obj.Get(), handler);
     }
 
-    template <class T> void Disconnect(const std::string &signal, T *obj)
+    template <class T> void Disconnect(const String &signal, T *obj)
     {
         signals_[signal].disconnect(obj);
     }
 
-    template <class T> void Disconnect(const std::string &signal, SharedPtr<T> obj)
+    template <class T> void Disconnect(const String &signal, SharedPtr<T> obj)
     {
         signals_[signal].disconnect(obj.Get());
     }
 
-    void DisconnectAll(const std::string &signal);
+    void DisconnectAll(const String &signal);
 
     void DisconnectAll();
 
-    void Emit(const std::string &signal, VariantMap &params);
+    void Emit(const String &signal, VariantMap &params);
 
     // TODO: how to manage the dummy object's life cycle?
-    // void Connect(const std::string &signal, std::function<void(VariantMap &)> &&handler)
+    // void Connect(const String &signal, std::function<void(VariantMap &)> &&handler)
     // {
     //     struct Dummy : public sigslot::has_slots<>
     //     {

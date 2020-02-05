@@ -163,6 +163,8 @@ public:
     /// `GetBytesLength` function.
     void GetBytes(CharSet charSet, void *buffer) const;
 
+    uint64_t Hash() const;
+
 protected:
     virtual StringView SubStringViewImpl(uint32_t from, uint32_t length) const = 0;
 
@@ -206,7 +208,6 @@ public:
 
     CharType *Data() override;
     const CharType *Data() const override;
-    StringView SubStringViewImpl(uint32_t from, uint32_t length) const override;
     String &operator=(const String &s);
     String &operator=(String &&s) noexcept;
     String &operator+=(const String &s);
@@ -244,6 +245,7 @@ public:
     }
 
 private:
+    StringView SubStringViewImpl(uint32_t from, uint32_t length) const override;
     void ReAllocate(uint32_t newCapacity);
     void Free();
 

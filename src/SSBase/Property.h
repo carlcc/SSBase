@@ -57,12 +57,12 @@ class Property
 public:
     Property(const Property &) = default;
     Property(Property &&) = default;
-    Property(std::string &&name, ss::Variant::Type type, ss::SharedPtr<ss::PropertyAccessor> accessor, int32_t flags)
-        : name_(std::forward<std::string &&>(name)), type(type), accessor_(std::move(accessor)), flags(flags)
+    Property(String &&name, ss::Variant::Type type, ss::SharedPtr<ss::PropertyAccessor> accessor, int32_t flags)
+        : name_(std::forward<String>(name)), type(type), accessor_(std::move(accessor)), flags(flags)
     {
     }
 
-    const std::string &GetName() const
+    const String &GetName() const
     {
         return name_;
     }
@@ -84,10 +84,10 @@ private:
     {
         kFlagNone = 0,
     };
-    std::string name_;
+    String name_;
     Variant::Type type;
     SharedPtr<PropertyAccessor> accessor_;
     int32_t flags;
 };
 
-}
+} // namespace ss

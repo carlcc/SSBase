@@ -14,13 +14,13 @@ int main()
 {
     TestString::test();
 
-    //    TestRefCount::test_refcounter();
+    TestRefCount::test_refcounter();
 
-    // TestReflection::test();
+    TestVariant::test();
 
-    //    TestVariant::test();
+    TestReflection::test();
 
-    // TestSignal::test();
+    TestSignal::test();
 
     // TestStream::test();
 

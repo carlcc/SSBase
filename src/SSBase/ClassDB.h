@@ -6,7 +6,7 @@
 
 #include "Object.h"
 #include "Ptr.h"
-#include <string>
+#include "Str.h"
 
 namespace ss
 {
@@ -49,18 +49,18 @@ public:
         RegisterObjectCtor(T::GetTypeNameStatic(), []() -> SharedPtr<Object> { return SharedPtr<Object>(new T); });
     }
 
-    template <class T> static void RegisterConstructor(const std::string &category)
+    template <class T> static void RegisterConstructor(const String &category)
     {
         RegisterObjectCtor(
             T::GetTypeNameStatic(), []() -> SharedPtr<Object> { return SharedPtr<Object>(new T); }, category);
     }
 
 private:
-    static void RegisterObjectCtor(const std::string &className, ObjectCtor constructor);
+    static void RegisterObjectCtor(const String &className, ObjectCtor constructor);
 
-    static void RegisterObjectCtor(const std::string &className, ObjectCtor constructor, const std::string &category);
+    static void RegisterObjectCtor(const String &className, ObjectCtor constructor, const String &category);
 
-    static ObjectCtor GetObjectCtor(const std::string &className);
+    static ObjectCtor GetObjectCtor(const String &className);
 
 private:
 };

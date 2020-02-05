@@ -6,20 +6,23 @@
 #include <SSBase/ClassDB.h>
 #include <SSBase/Object.h>
 #include <SSBase/Ptr.h>
+#include <sstream>
 
 namespace TestVariant
 {
+
+std::stringstream gOutput;
 
 class A : public ss::RefCounted
 {
 public:
     A()
     {
-        std::cout << "Construct A " << std::endl;
+        gOutput << "Construct A" << std::endl;
     }
     ~A()
     {
-        std::cout << "Destruct A " << std::endl;
+        gOutput << "Destruct A" << std::endl;
     }
 };
 bool test()
@@ -33,15 +36,24 @@ bool test()
         SharedPtr<A> pa;
         {
             Variant sharedPtrValue = SharedPtr<A>(new A);
-            std::cout << intValue.GetInt() << std::endl;
+            gOutput << intValue.GetInt() << std::endl;
             pa = sharedPtrValue.GetPtr();
         }
-        std::cout << "Exit scope" << std::endl;
+        gOutput << "Exit scope" << std::endl;
     }
 
-    std::cout << int64Value.GetInt64() << std::endl;
-    std::cout << stringValue.GetString() << std::endl;
+    gOutput << int64Value.GetInt64() << std::endl;
+    gOutput << stringValue.GetString() << std::endl;
+
+    std::string kResult = R"(Construct A
+1
+Exit scope
+Destruct A
+1
+hello
+)";
+    SSASSERT(kResult == gOutput.str());
     return true;
 }
 
-}
+} // namespace TestVariant

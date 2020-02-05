@@ -80,6 +80,7 @@ void Variant::SetType(Variant::Type t)
         break;
     case Type::kTypeString:
         new (&value_.string_) String;
+        break;
     case Type::kTypePtr:
         new (&value_.ptr_) SharedPtr<RefCounted>;
         break;
@@ -93,6 +94,7 @@ void Variant::SetType(Variant::Type t)
         SSASSERT(false);
     }
 }
+
 Variant &Variant::operator=(const Variant &v)
 {
     SetType(v.type_);

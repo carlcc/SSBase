@@ -513,6 +513,18 @@ void CharSequence::GetBytes(CharSet charSet, void *buffer) const
     p[index] = '\0';
 }
 
+uint64_t CharSequence::Hash() const
+{
+    // djb2
+    uint64_t hash = 5381;
+    CharType c;
+    for (uint32_t i = 0; i < Length(); ++i)
+    {
+        hash = ((hash << 5u) + hash) + At(i); /* hash * 33 + c */
+    }
+    return hash;
+}
+
 StringView::StringView(SequenceData *sequenceData, uint32_t offset, uint32_t length) : CharSequence()
 {
     sequenceData_ = sequenceData;

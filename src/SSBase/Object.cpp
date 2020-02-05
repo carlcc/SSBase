@@ -7,9 +7,10 @@
 namespace ss
 {
 
-const char *Object::GetTypeNameStatic()
+const String &Object::GetTypeNameStatic()
 {
-    return "Object";
+    static String name("Object");
+    return name;
 }
 
 const RuntimeTypeInfo *Object::GetTypeInfoStatic()
@@ -25,12 +26,12 @@ const PropertyMap &Object::GetAllPropertiesStatic()
         PropertyMapLoader() : propertyMap_(Object::RegisterProperties())
         {
         }
-        std::map<std::string, Property> propertyMap_;
+        std::map<String, Property> propertyMap_;
     } sPropertyMap;
     return sPropertyMap.propertyMap_;
 }
 
-const char *Object::GetTypeName()
+const String &Object::GetTypeName()
 {
     return Object::GetTypeNameStatic();
 }
@@ -51,7 +52,7 @@ PropertyMap Object::RegisterProperties()
     return propertyMap;
 }
 
-void Object::DisconnectAll(const std::string &signal)
+void Object::DisconnectAll(const String &signal)
 {
     signals_[signal].disconnect_all();
 }
@@ -61,7 +62,7 @@ void Object::DisconnectAll()
     signals_.clear();
 }
 
-void Object::Emit(const std::string &signal, VariantMap &params)
+void Object::Emit(const String &signal, VariantMap &params)
 {
     auto it = signals_.find(signal);
     if (it == signals_.end())

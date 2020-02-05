@@ -10,6 +10,8 @@
 namespace TestSignal
 {
 
+std::stringstream gOutput;
+
 class Switcher : public ss::Object
 {
     SS_OBJECT(Switcher, ss::Object);
@@ -41,7 +43,7 @@ public:
         {
             isOn_ = false;
         }
-        std::cout << "Toggle light " << id_ << " to " << (isOn_ ? "on" : "off") << std::endl;
+        gOutput << "Toggle light " << id_ << " to " << (isOn_ ? "on" : "off") << std::endl;
     }
 
     int n_;
@@ -58,7 +60,7 @@ public:
     void handleSwitch(ss::VariantMap &params)
     {
         isOn_ = !isOn_;
-        std::cout << "Toggle fan " << (isOn_ ? "on" : "off") << ", And greetings: " << params["msg"].GetString()
+        gOutput << "Toggle fan " << (isOn_ ? "on" : "off") << ", And greetings: " << params["msg"].GetString()
                   << std::endl;
     }
 
@@ -67,30 +69,65 @@ public:
 
 bool test()
 {
-    ss::SharedPtr<Switcher> switcher = ss::MakeShared<Switcher>();
-    ss::SharedPtr<Light> light1 = ss::MakeShared<Light>(2);
-    ss::SharedPtr<Light> light2 = ss::MakeShared<Light>(3);
-    ss::SharedPtr<Fan> fan = ss::MakeShared<Fan>();
-    switcher->Connect("toggle", light1, &Light::handleSwitch);
-    switcher->Connect("toggle", light2, &Light::handleSwitch);
-    switcher->Connect("toggle", fan, &Fan::handleSwitch);
-
-    ss::VariantMap params;
-    params["msg"] = "'Greeting msg!'";
-    for (int i = 0; i < 10; ++i)
     {
-        std::cout << "======" << i << std::endl;
-        if (i == 5)
+        ss::SharedPtr<Switcher> switcher = ss::MakeShared<Switcher>();
+        ss::SharedPtr<Light> light1 = ss::MakeShared<Light>(2);
+        ss::SharedPtr<Light> light2 = ss::MakeShared<Light>(3);
+        ss::SharedPtr<Fan> fan = ss::MakeShared<Fan>();
+        switcher->Connect("toggle", light1, &Light::handleSwitch);
+        switcher->Connect("toggle", light2, &Light::handleSwitch);
+        switcher->Connect("toggle", fan, &Fan::handleSwitch);
+
+        ss::VariantMap params;
+        params["msg"] = "'Greeting msg!'";
+        for (int i = 0; i < 10; ++i)
         {
-            switcher->Disconnect("toggle", fan);
+            gOutput << "======" << i << std::endl;
+            if (i == 5)
+            {
+                switcher->Disconnect("toggle", fan);
+            }
+            if (i == 6)
+            {
+                light2 = nullptr;
+            }
+            switcher->Emit("toggle", params);
         }
-        if (i == 6)
-        {
-            light2 = nullptr;
-        }
-        switcher->Emit("toggle", params);
     }
+
+    std::string kResult = R"(======0
+Toggle light 1 to off
+Toggle light 2 to off
+Toggle fan on, And greetings: 'Greeting msg!'
+======1
+Toggle light 1 to on
+Toggle light 2 to off
+Toggle fan off, And greetings: 'Greeting msg!'
+======2
+Toggle light 1 to off
+Toggle light 2 to on
+Toggle fan on, And greetings: 'Greeting msg!'
+======3
+Toggle light 1 to on
+Toggle light 2 to off
+Toggle fan off, And greetings: 'Greeting msg!'
+======4
+Toggle light 1 to off
+Toggle light 2 to off
+Toggle fan on, And greetings: 'Greeting msg!'
+======5
+Toggle light 1 to on
+Toggle light 2 to on
+======6
+Toggle light 1 to off
+======7
+Toggle light 1 to on
+======8
+Toggle light 1 to off
+======9
+Toggle light 1 to on
+)";
     return true;
 }
 
-}
+} // namespace TestSignal
