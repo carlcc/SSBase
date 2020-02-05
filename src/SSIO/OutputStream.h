@@ -16,7 +16,9 @@ class OutputStream : public Object
 public:
     OutputStream() = default;
     OutputStream(const OutputStream &) = delete;
+    OutputStream(OutputStream &&) = delete;
     OutputStream &operator=(const OutputStream &) = delete;
+    OutputStream &operator=(OutputStream &&) = delete;
     ~OutputStream() override = default;
 
     /// Write 1 byte, returns the byte if succeed, else returns error code on error

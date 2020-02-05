@@ -17,7 +17,9 @@ class InputStream : public Object
 public:
     InputStream() = default;
     InputStream(const InputStream &) = delete;
+    InputStream(InputStream &&) = delete;
     InputStream &operator=(const InputStream &) = delete;
+    InputStream &operator=(InputStream &&) = delete;
     ~InputStream() override = default;
 
     /// Read 1 byte, returns the byte, returns -1 on EOF reached, else return the error code

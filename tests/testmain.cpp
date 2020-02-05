@@ -1,24 +1,28 @@
 //
 // Copyright (c) 2020 Carl Chen. All rights reserved.
 //
+#include <iostream>
 
-#include "testrefcounter.h"
 #include "test_reflection.h"
-#include "test_variant.h"
 #include "test_signal.h"
 #include "test_stream.h"
+#include "test_string.h"
+#include "test_variant.h"
+#include "testrefcounter.h"
+
 int main()
 {
-//    TestRefCount::test_refcounter();
+    TestString::test();
 
-    TestReflection::test();
+    //    TestRefCount::test_refcounter();
 
-//    TestVariant::test();
+    // TestReflection::test();
 
-    TestSignal::test();
+    //    TestVariant::test();
 
-    TestStream::test();
+    // TestSignal::test();
+
+    // TestStream::test();
 
     std::cout << "end main" << std::endl;
-
 }
