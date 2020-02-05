@@ -8,6 +8,11 @@
 namespace ss
 {
 
+FileOutputStream::FileOutputStream(const CharSequence &file) : filePtr_(nullptr)
+{
+    new (this) FileOutputStream(file.ToStdString().c_str());
+}
+
 FileOutputStream::FileOutputStream(const std::string &file) : filePtr_(nullptr)
 {
     new (this) FileOutputStream(file.c_str());

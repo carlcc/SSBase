@@ -15,6 +15,8 @@ class FileInputStream : public InputStream
     SS_OBJECT(FileInputStream, InputStream);
 
 public:
+    explicit FileInputStream(const CharSequence &file);
+
     explicit FileInputStream(const std::string &file);
 
     explicit FileInputStream(const char *file);
@@ -40,4 +42,4 @@ private:
     int64_t totalFileSize_;
 };
 
-}
+} // namespace ss

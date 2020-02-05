@@ -513,6 +513,15 @@ void CharSequence::GetBytes(CharSet charSet, void *buffer) const
     p[index] = '\0';
 }
 
+std::string CharSequence::ToStdString(CharSequence::CharSet charSet) const
+{
+    uint32_t utf8Length = GetBytesLength(charSet);
+
+    std::string ss(utf8Length, L'\0');
+    GetBytes(CharSequence::kUtf8, const_cast<char *>(ss.data()));
+    return ss;
+}
+
 uint64_t CharSequence::Hash() const
 {
     // djb2
@@ -916,11 +925,7 @@ void String::Free()
 
 std::ostream &operator<<(std::ostream &os, const CharSequence &s)
 {
-    uint32_t utf8Length = s.GetBytesLength(CharSequence::kUtf8);
-
-    std::string ss(utf8Length, L'\0');
-    s.GetBytes(CharSequence::kUtf8, const_cast<char *>(ss.data()));
-    os << ss;
+    os << s.ToStdString(CharSequence::kUtf8);
     return os;
 }
 

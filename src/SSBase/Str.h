@@ -162,6 +162,7 @@ public:
     /// NOTE: This function assumes the buffer is big enough, you can check the required size by invoking
     /// `GetBytesLength` function.
     void GetBytes(CharSet charSet, void *buffer) const;
+    std::string ToStdString(CharSet charSet = kUtf8) const;
 
     uint64_t Hash() const;
 

@@ -14,6 +14,8 @@ class FileOutputStream : public OutputStream
     SS_OBJECT(FileOutputStream, OutputStream);
 
 public:
+    explicit FileOutputStream(const CharSequence &file);
+
     explicit FileOutputStream(const std::string &file);
 
     explicit FileOutputStream(const char *file);

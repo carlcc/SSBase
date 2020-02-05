@@ -7,6 +7,10 @@
 
 namespace ss
 {
+FileInputStream::FileInputStream(const CharSequence &file)
+{
+    new (this) FileInputStream(file.ToStdString().c_str());
+}
 
 FileInputStream::FileInputStream(const std::string &file) : filePtr_(nullptr), totalFileSize_(0)
 {
@@ -94,7 +98,7 @@ std::string FileInputStream::ReadAll()
 {
     std::string result;
     result.resize(Available());
-    Read(const_cast<char*>(result.data()), result.size());
+    Read(const_cast<char *>(result.data()), result.size());
     return result;
 }
 
