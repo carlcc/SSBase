@@ -102,4 +102,28 @@ std::string FileInputStream::ReadAll()
     return result;
 }
 
+int FileInputStream::Seek(int64_t offset, SeekableInputStream::Whence whence)
+{
+    int wc;
+    switch (whence)
+    {
+    case kSeekCur:
+        wc = SEEK_CUR;
+        break;
+    case kSeekSet:
+        wc = SEEK_SET;
+        break;
+    case kSeekEnd:
+        wc = SEEK_END;
+        break;
+    default:
+        SSASSERT(false);
+    }
+    if (0 == fseek(filePtr_, offset, wc))
+    {
+        return StreamConstant::ErrorCode::kOk;
+    }
+    return StreamConstant::ErrorCode::kUnknown;
+}
+
 } // namespace ss

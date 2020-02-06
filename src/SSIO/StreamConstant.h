@@ -9,6 +9,7 @@ class StreamConstant
 public:
     enum ErrorCode
     {
+        kOk = 0,
         kEof = -1,
         kUnknown = -128
     };

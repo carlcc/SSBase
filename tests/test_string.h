@@ -19,10 +19,16 @@ bool test()
     StringView sv1 = s1.SubStringView(0, s1.Length());
     String s4(sv1);
 
+    SSASSERT(s1 + s2 == "hello，你好，world!hello，你好，world!");
+    SSASSERT(sv1 + s2 == "hello，你好，world!hello，你好，world!");
+    SSASSERT(sv1 + "11111" == "hello，你好，world!11111");
     SSASSERT(s1.StartsWith("hello，"));
     SSASSERT(s1.EndsWith("，world!"));
     SSASSERT(s1.Contains("，你好"));
     SSASSERT(s1.Find("o，你好") == 4);
+    SSASSERT(s1.Find(s1) == 0);
+    SSASSERT(s1.RFind("o") == 10);
+    SSASSERT(s1.RFind(s2) == 0);
     SSASSERT(s1.Compare("hello，你好，world!1") < 0);
     SSASSERT(s1.Compare("hello，你好，world!1") <= 0);
     SSASSERT(s1.Compare("hello，你好，world!") == 0);

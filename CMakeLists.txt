@@ -11,5 +11,6 @@ add_subdirectory(src/SSIO)
 
 add_executable(testmain tests/testmain.cpp)
 add_dependencies(testmain SSBase SSIO)
-target_link_libraries(testmain SSBase SSIO)
+target_link_directories(testmain PRIVATE thirdparty/lib)
+target_link_libraries(testmain SSBase SSIO archive zip z)
 target_include_directories(testmain PRIVATE src)

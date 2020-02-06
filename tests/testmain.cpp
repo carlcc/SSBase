@@ -3,6 +3,7 @@
 //
 #include <iostream>
 
+#include "test_archive.h"
 #include "test_reflection.h"
 #include "test_signal.h"
 #include "test_stream.h"
@@ -24,5 +25,9 @@ int main()
 
     // TestStream::test();
 
+    TestArchive::test();
+
     std::cout << "end main" << std::endl;
+
+    return 0;
 }

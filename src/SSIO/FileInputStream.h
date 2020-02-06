@@ -4,15 +4,16 @@
 
 #pragma once
 
-#include "InputStream.h"
+#include "SeekableInputStream.h"
+#include "StreamConstant.h"
 #include <cstdio>
 
 namespace ss
 {
 
-class FileInputStream : public InputStream
+class FileInputStream : public SeekableInputStream
 {
-    SS_OBJECT(FileInputStream, InputStream);
+    SS_OBJECT(FileInputStream, SeekableInputStream);
 
 public:
     explicit FileInputStream(const CharSequence &file);
@@ -36,6 +37,8 @@ public:
     bool IsValid() const override;
 
     std::string ReadAll();
+
+    int Seek(int64_t offset, Whence whence) override;
 
 private:
     FILE *filePtr_;
