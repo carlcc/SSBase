@@ -5,6 +5,7 @@
 #pragma once
 
 #include "RefCounted.h"
+#include <functional>
 #include <memory>
 
 namespace ss
@@ -102,9 +103,12 @@ public:
 
     SharedPtr &operator=(SharedPtr &&p) noexcept
     {
-        DecreaseRefCount();
-        refCounter_ = p.refCounter_;
-        p.refCounter_ = nullptr;
+        if (p.refCounter_ != refCounter_)
+        {
+            DecreaseRefCount();
+            refCounter_ = p.refCounter_;
+            p.refCounter_ = nullptr;
+        }
         return *this;
     }
 
@@ -227,9 +231,12 @@ public:
 
     WeakPtr &operator=(WeakPtr &&p) noexcept
     {
-        DecreaseRefCount();
-        refCounter_ = p.refCounter_;
-        p.refCounter_ = nullptr;
+        if (p.refCounter_ != refCounter_)
+        {
+            DecreaseRefCount();
+            refCounter_ = p.refCounter_;
+            p.refCounter_ = nullptr;
+        }
         return *this;
     }
 
@@ -322,5 +329,77 @@ template <class T, class... Args> inline SharedPtr<T> MakeShared(Args &&... args
 {
     return SharedPtr<T>(new T(std::forward<Args>(args)...));
 }
+
+template <class T> void _ScopedPtrDefaultDestructor(T *t)
+{
+    delete t;
+}
+template <class T, std::function<void(T *)> destructor = _ScopedPtrDefaultDestructor<T>> class ScopedPtr
+{
+public:
+    ScopedPtr(T *t) : obj_(t) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    {
+    }
+    ScopedPtr(const ScopedPtr &) = delete;
+    ScopedPtr(ScopedPtr &&p) noexcept : obj_(p.obj_) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    {
+        p.obj_ = nullptr;
+    }
+    ~ScopedPtr()
+    {
+        Free();
+    }
+    T *Get() const
+    {
+        return obj_;
+    }
+
+    explicit operator bool() const
+    {
+        return Get() != nullptr;
+    }
+
+    bool operator!() const
+    {
+        return Get() == nullptr;
+    }
+
+    explicit operator T *() const
+    {
+        return Get();
+    }
+
+    T *operator->() const
+    {
+        return Get();
+    }
+
+    T &operator*() const
+    {
+        return *Get();
+    }
+
+    ScopedPtr &operator=(const ScopedPtr &) = delete;
+    ScopedPtr &operator=(ScopedPtr &&p) noexcept
+    {
+        if (&p != this)
+        {
+            Free();
+            obj_ = p.obj_;
+            p.obj_ = nullptr;
+        }
+        return *this;
+    }
+
+private:
+    void Free()
+    {
+        destructor(obj_);
+        obj_ = nullptr;
+    }
+
+private:
+    T *obj_;
+};
 
 } // namespace ss

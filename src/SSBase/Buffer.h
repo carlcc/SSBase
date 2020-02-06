@@ -50,7 +50,7 @@ public:
         return size;
     }
 
-    void PushData(void *data, uint32_t length)
+    void PushData(const void *data, uint32_t length)
     {
         SSASERT(length <= Capacity() - Size());
         if (offset_ + length <= Capacity())
@@ -59,12 +59,24 @@ public:
             offset_ = 0;
         }
         memcpy(GetData<uint8_t>() + Size(), data, length);
+        size_ += length;
+    }
+
+    uint32_t TryPushData(const void *data, uint32_t length)
+    {
+        if (length + Size() > Capacity())
+        {
+            length = Capacity() - Size();
+        }
+        PushData(data, length);
+        return length;
     }
 
     void Skip(uint32_t n)
     {
         SSASSERT(Size() >= n);
         offset_ += n;
+        size_ -= n;
     }
 
     uint32_t Capacity() const
@@ -75,6 +87,11 @@ public:
     uint32_t Size() const
     {
         return size_;
+    }
+
+    bool Empty() const
+    {
+        return Size() == 0;
     }
 
     uint8_t operator[](int32_t index) const

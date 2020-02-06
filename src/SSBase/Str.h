@@ -130,7 +130,16 @@ public:
     }
 
     uint32_t Find(const CharSequence &s, uint32_t start = 0) const;
-    uint32_t Find(const String &s, uint32_t start = 0) const;
+    uint32_t Find(const String &s, uint32_t start = 0) const
+    {
+        return Find((const CharSequence &)s, start);
+    }
+    /// NOTE: end is not included
+    uint32_t RFind(const CharSequence &s, uint32_t end = kNPos) const;
+    uint32_t RFind(const String &s, uint32_t end = kNPos) const
+    {
+        return RFind((const CharSequence &)s, end);
+    }
 
     void ToUpper();
     void ToLower();
@@ -253,6 +262,34 @@ private:
 private:
     uint32_t capacity_;
 };
+
+inline String operator+(const CharSequence &s1, const CharSequence &s2)
+{
+    String s(s1);
+    s += s2;
+    return s;
+}
+
+inline String operator+(const CharSequence &s1, const String &s2)
+{
+    String s(s1);
+    s += s2;
+    return s;
+}
+
+inline String operator+(const String &s1, const CharSequence &s2)
+{
+    String s(s1);
+    s += s2;
+    return s;
+}
+
+inline String operator+(const String &s1, const String &s2)
+{
+    String s(s1);
+    s += s2;
+    return s;
+}
 
 #define SS_DEFINE_COMPARE_OPERATOR(type1, type2)                                                                       \
     inline bool operator==(const type1 &s1, const type2 &s2)                                                           \

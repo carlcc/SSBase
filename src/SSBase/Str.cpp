@@ -406,7 +406,7 @@ uint32_t CharSequence::Find(const CharSequence &s, uint32_t start) const
     {
         return kNPos;
     }
-    uint32_t n = Length() - s.Length();
+    uint32_t n = Length() - s.Length() + 1;
     for (uint32_t i = start; i < n; ++i)
     {
         if (memcmp(Data() + i, s.Data(), s.Length() * sizeof(CharType)) == 0)
@@ -417,9 +417,26 @@ uint32_t CharSequence::Find(const CharSequence &s, uint32_t start) const
     return kNPos;
 }
 
-uint32_t CharSequence::Find(const String &s, uint32_t start) const
+uint32_t CharSequence::RFind(const CharSequence &s, uint32_t end) const
 {
-    return Find((const CharSequence &)s, start);
+    if (end > Length())
+    {
+        end = Length();
+    }
+    if (end < s.Length())
+    {
+        return kNPos;
+    }
+
+    uint32_t n = Length() - s.Length() + 1;
+    for (uint32_t i = n; i > 0; --i)
+    {
+        if (memcmp(Data() + i - 1, s.Data(), s.Length() * sizeof(CharType)) == 0)
+        {
+            return i - 1;
+        }
+    }
+    return kNPos;
 }
 
 void CharSequence::ToUpper()
