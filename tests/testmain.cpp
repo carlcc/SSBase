@@ -23,7 +23,7 @@ int main()
 
     TestSignal::test();
 
-    // TestStream::test();
+    TestStream::test();
 
     TestArchive::test();
 

@@ -4,6 +4,7 @@
 
 #include "Str.h"
 #include "Assert.h"
+#include "Misc.h"
 #include "thirdparty/fmt/fmt/format.h"
 #include <cstring>
 #include <cwchar>
@@ -543,7 +544,6 @@ uint64_t CharSequence::Hash() const
 {
     // djb2
     uint64_t hash = 5381;
-    CharType c;
     for (uint32_t i = 0; i < Length(); ++i)
     {
         hash = ((hash << 5u) + hash) + At(i); /* hash * 33 + c */
@@ -651,13 +651,7 @@ inline uint32_t GetUtf8Length(const char *utf8)
 
 inline uint32_t CalculateCapacity(uint32_t len)
 {
-    uint32_t last = 0;
-    while (len > 0)
-    {
-        last = len;
-        len &= len - 1;
-    }
-    return last << 1u;
+    return Misc::CeilToPowerOfTwo(len);
 }
 
 String::String(const char *utf8) : CharSequence(), capacity_(0)

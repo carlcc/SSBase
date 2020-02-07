@@ -34,10 +34,10 @@ int FileOutputStream::Write(uint8_t byte)
     return fputc(byte, filePtr_);
 }
 
-int32_t FileOutputStream::Write(void *buf, uint32_t count)
+int32_t FileOutputStream::Write(const void *data, uint32_t count)
 {
     SSASSERT(filePtr_ != nullptr);
-    size_t c = fwrite(buf, 1, count, filePtr_);
+    size_t c = fwrite(data, 1, count, filePtr_);
     if (c < count)
     {
         return StreamConstant::ErrorCode::kUnknown;
@@ -49,6 +49,7 @@ void FileOutputStream::Close()
 {
     if (filePtr_ != nullptr)
     {
+        Flush();
         fclose(filePtr_);
         filePtr_ = nullptr;
     }
@@ -57,6 +58,15 @@ void FileOutputStream::Close()
 bool FileOutputStream::IsValid() const
 {
     return filePtr_ != nullptr;
+}
+
+int32_t FileOutputStream::Flush()
+{
+    if (fflush(filePtr_) == 0)
+    {
+        return StreamConstant::ErrorCode::kOk;
+    }
+    return StreamConstant::ErrorCode::kUnknown;
 }
 
 } // namespace ss

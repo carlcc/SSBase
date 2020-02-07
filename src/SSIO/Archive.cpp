@@ -19,7 +19,7 @@ class Archive::ArchiveInputStream : public InputStream
 
 public:
     explicit ArchiveInputStream(zip_file_t *zipFile, int64_t available)
-        : zipFile_(zipFile), available_(available), buffer_()
+        : zipFile_(zipFile), available_(available)
     {
     }
 
@@ -41,47 +41,19 @@ public:
 
     int32_t Read(void *buf, uint32_t count) override
     {
-        auto *ubuf = static_cast<uint8_t *>(buf);
-        int32_t readCount = 0;
-        while (true)
+        auto size = zip_fread(zipFile_, buf, count);
+        if (size < 0)
         {
-            if (buffer_.Size() > 0)
-            {
-                uint32_t n = count > buffer_.Size() ? buffer_.Size() : count;
-                buffer_.ReadData(ubuf, n);
-                count -= n;
-                ubuf += n;
-                readCount += n;
-                buffer_.Skip(n);
-            }
-            if (count == 0)
-            {
-                break;
-            }
-
-            SSASSERT(buffer_.Empty());
-
-            auto size = zip_fread(zipFile_, buffer_.GetBufferHead(), buffer_.Capacity());
-            if (size < 0)
-            {
-                /* ERROR */
-                return StreamConstant::ErrorCode::kUnknown;
-            }
-            if (size == 0)
-            {
-                if (readCount == 0)
-                {
-                    return StreamConstant::ErrorCode::kEof;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            buffer_.Reset(0, size);
+            /* ERROR */
+            return StreamConstant::ErrorCode::kUnknown;
         }
-        available_ -= readCount;
-        return readCount;
+        if (size == 0)
+        {
+            return StreamConstant::ErrorCode::kEof;
+        }
+
+        available_ -= size;
+        return size;
     }
 
     int64_t Skip(int64_t n) override
@@ -110,7 +82,6 @@ public:
 
     zip_file_t *zipFile_;
     int64_t available_;
-    Buffer<10240> buffer_;
 };
 
 class Archive::Impl

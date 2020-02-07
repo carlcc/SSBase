@@ -5,6 +5,7 @@
 #pragma once
 
 #include <SSIO/Archive.h>
+#include <SSIO/BufferedInputStream.h>
 #include <SSIO/InputStream.h>
 #include <SSIO/StreamConstant.h>
 
@@ -22,7 +23,8 @@ bool test()
     {
         std::cout << "== " << e << std::endl;
     }
-    auto is = archive.GetInputStream("include/zipconf.h");
+    auto ais = archive.GetInputStream("include/zipconf.h");
+    auto is = MakeShared<BufferedInputStream>(ais.Get());
     std::cout << "== " << is->IsValid() << std::endl;
     char buf[256];
     std::string result;

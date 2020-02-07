@@ -5,6 +5,8 @@
 #pragma once
 
 #include <SSBase/Ptr.h>
+#include <SSIO/BufferedInputStream.h>
+#include <SSIO/BufferedOutputStream.h>
 #include <SSIO/FileInputStream.h>
 #include <SSIO/FileOutputStream.h>
 
@@ -14,8 +16,12 @@ namespace TestStream
 bool test()
 {
     using namespace ss;
-    SharedPtr<InputStream> fis = MakeShared<FileInputStream>("/Users/chenchen02/all.tar.bz2");
-    SharedPtr<OutputStream> fos = MakeShared<FileOutputStream>("/Users/chenchen02/all.tar.bz2" + std::string(".copy"));
+    SharedPtr<InputStream> fis1 = MakeShared<FileInputStream>("/Users/chenchen02/lz4-1.9.2.tar.gz");
+    SharedPtr<OutputStream> fos1 =
+        MakeShared<FileOutputStream>("/Users/chenchen02/lz4-1.9.2.tar.gz" + std::string(".copy"));
+
+    auto fis = MakeShared<BufferedInputStream>(fis1);
+    auto fos = MakeShared<BufferedOutputStream>(fos1);
     char buffer[4096];
     if (fis->IsValid() && fos->IsValid())
     {

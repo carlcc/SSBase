@@ -24,11 +24,12 @@ public:
 
     int Write(uint8_t byte) override;
 
-    int32_t Write(void *buf, uint32_t count) override;
+    int32_t Write(const void *data, uint32_t count) override;
 
     void Close() override;
 
     bool IsValid() const override;
+    int32_t Flush() override;
 
 private:
     FILE *filePtr_;

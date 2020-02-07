@@ -26,7 +26,7 @@ public:
 
     /// Write `count` bytes, returns the actual written bytes number, returns error code on error
     /// NOTE: Invoke Write() function by default, you'd better override it for better performance.
-    virtual int32_t Write(void *buf, uint32_t count);
+    virtual int32_t Write(const void *data, uint32_t count);
 
     /// NOTE: This function is provide here just for early closing a file. The destructor `~InputStream()`
     /// is not able to invoke the overrides of `Close` function, so you may need to release resources
@@ -35,6 +35,9 @@ public:
 
     /// Return true if this stream is valid, else false
     virtual bool IsValid() const = 0;
+
+    /// Flush data
+    virtual int32_t Flush() = 0;
 
     /// Returns true if this stream is not valid, else false
     bool operator!() const

@@ -75,7 +75,7 @@ public:
         return Get() == nullptr;
     }
 
-    explicit operator T *() const
+    operator T *() const // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
     {
         return Get();
     }
@@ -364,7 +364,7 @@ public:
         return Get() == nullptr;
     }
 
-    explicit operator T *() const
+    operator T *() const // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
     {
         return Get();
     }
