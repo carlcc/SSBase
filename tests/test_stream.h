@@ -5,10 +5,10 @@
 #pragma once
 
 #include <SSBase/Ptr.h>
-#include <SSIO/BufferedInputStream.h>
-#include <SSIO/BufferedOutputStream.h>
-#include <SSIO/FileInputStream.h>
-#include <SSIO/FileOutputStream.h>
+#include <SSIO/stream/BufferedInputStream.h>
+#include <SSIO/stream/BufferedOutputStream.h>
+#include <SSIO/stream/FileInputStream.h>
+#include <SSIO/stream/FileOutputStream.h>
 
 namespace TestStream
 {

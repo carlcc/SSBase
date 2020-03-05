@@ -3,9 +3,9 @@
 //
 
 #include "Lz4InputStream.h"
-#include "../SSBase/Buffer.h"
+#include "../../SSBase/Buffer.h"
+#include "../thirdparty/lz4/lz4.h"
 #include "StreamConstant.h"
-#include "thirdparty/lz4/lz4.h"
 
 namespace ss
 {

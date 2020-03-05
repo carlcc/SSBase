@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "test_archive.h"
+#include "test_filesystem.h"
 #include "test_reflection.h"
 #include "test_signal.h"
 #include "test_stream.h"
@@ -22,6 +23,8 @@ int main()
     TestReflection::test();
 
     TestSignal::test();
+
+    TestFileSystem::test();
 
     TestStream::test();
 

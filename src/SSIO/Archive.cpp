@@ -5,8 +5,8 @@
 #include "Archive.h"
 #include "../SSBase/Buffer.h"
 #include "../SSBase/Ptr.h"
-#include "InputStream.h"
-#include "StreamConstant.h"
+#include "stream/InputStream.h"
+#include "stream/StreamConstant.h"
 #include <map>
 #include <zip.h>
 
@@ -18,8 +18,7 @@ class Archive::ArchiveInputStream : public InputStream
     SS_OBJECT(Archive::ArchiveInputStream, InputStream);
 
 public:
-    explicit ArchiveInputStream(zip_file_t *zipFile, int64_t available)
-        : zipFile_(zipFile), available_(available)
+    explicit ArchiveInputStream(zip_file_t *zipFile, int64_t available) : zipFile_(zipFile), available_(available)
     {
     }
 

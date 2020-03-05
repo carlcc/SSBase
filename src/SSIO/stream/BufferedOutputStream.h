@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../SSBase/Buffer.h"
+#include "../../SSBase/Buffer.h"
 #include "OutputStream.h"
 
 namespace ss
@@ -40,7 +40,10 @@ public:
 
     void Close() override
     {
-        Flush();
+        if (stream_.IsValid())
+        {
+            Flush();
+        }
     }
 
     bool IsValid() const override
@@ -55,4 +58,4 @@ private:
     DynamicBuffer buffer_;
 };
 
-}
+} // namespace ss

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../SSBase/Object.h"
+#include "../../SSBase/Object.h"
 #include <cstdint>
 
 namespace ss
@@ -59,4 +59,4 @@ public:
     }
 };
 
-}
+} // namespace ss

@@ -1,6 +1,6 @@
 project(SSIO)
 
-file(GLOB_RECURSE SSIO_SOURCE_FILES * thirdparty/*)
+file(GLOB SSIO_SOURCE_FILES file/* stream/* * thirdparty/*)
 
 add_library(SSIO ${SSIO_SOURCE_FILES})
 target_include_directories(SSIO PRIVATE .. ../../thirdparty/include)

@@ -5,9 +5,9 @@
 #pragma once
 
 #include <SSIO/Archive.h>
-#include <SSIO/BufferedInputStream.h>
-#include <SSIO/InputStream.h>
-#include <SSIO/StreamConstant.h>
+#include <SSIO/stream/BufferedInputStream.h>
+#include <SSIO/stream/InputStream.h>
+#include <SSIO/stream/StreamConstant.h>
 
 namespace TestArchive
 {
