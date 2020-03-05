@@ -28,9 +28,12 @@ public:
     };
     enum CharSet
     {
-        kUtf8
+        kUtf8,
+        kLocale = kUtf8
     };
 
+    static bool IsAsciiAlpha(CharType c);
+    static bool IsAlpha(CharType c);
     static bool IsUpper(CharType c);
     static bool IsLower(CharType c);
     static CharType ToUpper(CharType c);
@@ -146,18 +149,18 @@ public:
     String CopyToUpper() const;
     String CopyToLower() const;
 
-    StrSplitter Split(const CharSequence &splitter)
+    StrSplitter Split(const CharSequence &splitter) const
     {
         return {*this, splitter};
     }
 
-    StrSplitter Split(const String &splitter)
+    StrSplitter Split(const String &splitter) const
     {
         return Split((const CharSequence &)splitter);
     }
 
     /// insert the split-ed strings to container `c`, you may need to clear it before invoking this method.
-    template <class Container> void Split(const CharSequence &splitter, Container &c)
+    template <class Container> void Split(const CharSequence &splitter, Container &c) const
     {
         StrSplitter(*this, splitter).Split(c);
     }
@@ -171,7 +174,7 @@ public:
     /// NOTE: This function assumes the buffer is big enough, you can check the required size by invoking
     /// `GetBytesLength` function.
     void GetBytes(CharSet charSet, void *buffer) const;
-    std::string ToStdString(CharSet charSet = kUtf8) const;
+    std::string ToStdString(CharSet charSet = kLocale) const;
 
     uint64_t Hash() const;
 
@@ -208,6 +211,8 @@ class String : public CharSequence
 {
 public:
     explicit String();
+    String(char c);
+    String(wchar_t c);
     String(const char *utf8);       // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
     String(const wchar_t *unicode); // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
     String(const CharType *chars, uint32_t length);
@@ -227,6 +232,8 @@ public:
     String &operator+=(const char *utf8);
     String &operator=(const wchar_t *unicode);
     String &operator+=(const wchar_t *unicode);
+    String &operator+=(const wchar_t unicode);
+    String &operator+=(const char unicode);
 
     uint32_t Capacity() const
     {
@@ -277,6 +284,36 @@ inline String operator+(const CharSequence &s1, const String &s2)
     return s;
 }
 
+inline String operator+(const CharSequence &s1, char c)
+{
+    String s(s1);
+    s += c;
+    return s;
+}
+
+inline String operator+(char c, const CharSequence &s1)
+{
+    String s;
+    s += c;
+    s += s1;
+    return s;
+}
+
+inline String operator+(const CharSequence &s1, wchar_t c)
+{
+    String s(s1);
+    s += c;
+    return s;
+}
+
+inline String operator+(wchar_t c, const CharSequence &s1)
+{
+    String s;
+    s += c;
+    s += s1;
+    return s;
+}
+
 inline String operator+(const String &s1, const CharSequence &s2)
 {
     String s(s1);
@@ -288,6 +325,36 @@ inline String operator+(const String &s1, const String &s2)
 {
     String s(s1);
     s += s2;
+    return s;
+}
+
+inline String operator+(const String &s1, char c)
+{
+    String s(s1);
+    s += c;
+    return s;
+}
+
+inline String operator+(char c, const String &s1)
+{
+    String s;
+    s += c;
+    s += s1;
+    return s;
+}
+
+inline String operator+(const String &s1, wchar_t c)
+{
+    String s(s1);
+    s += c;
+    return s;
+}
+
+inline String operator+(wchar_t c, const String &s1)
+{
+    String s;
+    s += c;
+    s += s1;
     return s;
 }
 

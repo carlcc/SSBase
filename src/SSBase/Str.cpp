@@ -205,6 +205,20 @@ struct CharSequence::SequenceData
     }
 };
 
+bool CharSequence::IsAsciiAlpha(CharType c)
+{
+    return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
+}
+
+bool CharSequence::IsAlpha(CharType c)
+{
+    const uint32_t AA = L'Ａ';
+    const uint32_t ZZ = L'Ｚ';
+    const uint32_t aa = L'ａ';
+    const uint32_t zz = L'ｚ';
+    return IsAsciiAlpha(c) || c >= aa && c <= zz || c >= AA && c <= ZZ;
+}
+
 bool CharSequence::IsUpper(CharSequence::CharType c)
 {
     const uint32_t A = 'A';
@@ -429,7 +443,7 @@ uint32_t CharSequence::RFind(const CharSequence &s, uint32_t end) const
         return kNPos;
     }
 
-    uint32_t n = Length() - s.Length() + 1;
+    uint32_t n = end - s.Length() + 1;
     for (uint32_t i = n; i > 0; --i)
     {
         if (memcmp(Data() + i - 1, s.Data(), s.Length() * sizeof(CharType)) == 0)
@@ -588,7 +602,7 @@ StringView StringView::SubStringViewImpl(uint32_t from, uint32_t length) const
     {
         return StringView(sequenceData_, offset_ + length_, 0);
     }
-    if (from + length > length_) // end out of bound
+    if (uint64_t(from) + length > length_) // end out of bound
     {
         length = length_ - from;
     }
@@ -628,6 +642,18 @@ StringView &StringView::operator=(StringView &&sv) noexcept
 String::String() : CharSequence(), capacity_(0)
 {
     ReAllocate(16);
+}
+
+String::String(char c) : CharSequence(), capacity_(0)
+{
+    ReAllocate(16);
+    *this += c;
+}
+
+String::String(wchar_t c) : CharSequence(), capacity_(0)
+{
+    ReAllocate(16);
+    *this += c;
 }
 
 inline uint32_t GetUtf8Length(const char *utf8)
@@ -846,6 +872,30 @@ String &String::operator=(const wchar_t *unicode)
     {
         sequenceData_->chars_[i] = unicode[i];
     }
+    return *this;
+}
+
+String &String::operator+=(const wchar_t unicode)
+{
+    auto oldLen = length_;
+    ++length_;
+    if (Capacity() < length_)
+    {
+        ReAllocate(CalculateCapacity(length_));
+    }
+    sequenceData_->chars_[oldLen] = unicode;
+    return *this;
+}
+
+String &String::operator+=(const char c)
+{
+    auto oldLen = length_;
+    ++length_;
+    if (Capacity() < length_)
+    {
+        ReAllocate(CalculateCapacity(length_));
+    }
+    sequenceData_->chars_[oldLen] = c;
     return *this;
 }
 

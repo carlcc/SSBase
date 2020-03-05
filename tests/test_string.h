@@ -28,6 +28,10 @@ bool test()
     SSASSERT(s1.Find("o，你好") == 4);
     SSASSERT(s1.Find(s1) == 0);
     SSASSERT(s1.RFind("o") == 10);
+    SSASSERT(s1.RFind("o", 11) == 10);
+    SSASSERT(s1.RFind("o", 10) == 4);
+    SSASSERT(s1.RFind("o", 5) == 4);
+    SSASSERT(s1.RFind("o", 4) == String::kNPos);
     SSASSERT(s1.RFind(s2) == 0);
     SSASSERT(s1.Compare("hello，你好，world!1") < 0);
     SSASSERT(s1.Compare("hello，你好，world!1") <= 0);
