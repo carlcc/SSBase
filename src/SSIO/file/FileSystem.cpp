@@ -307,7 +307,6 @@ bool FileSystem::Delete(const CharSequence &path, bool recursive)
         }
     }
 
-    std::cout << "--- " << path << std::endl;
     return remove(path.ToStdString().c_str()) == 0;
 }
 

@@ -57,8 +57,6 @@ void test_relative_path()
         path2 = "/f/g";
         path1RelativeTo2 = FileSystem::GetRelativePath(path1, path2);
         path2RelativeTo1 = FileSystem::GetRelativePath(path2, path1);
-        std::cout << path1RelativeTo2 << std::endl;
-        std::cout << path2RelativeTo1 << std::endl;
         SSASSERT(path1RelativeTo2 == "h/i");
         SSASSERT(path2RelativeTo1 == "../..");
         SSASSERT(FileSystem::NormalizePath(path2 + '/' + path1RelativeTo2) == FileSystem::NormalizePath(path1));
@@ -113,7 +111,6 @@ void test_file_related()
         SSASSERT(FileSystem::IsDirectory(newDir));
 
         SSASSERT(!FileSystem::Delete(newFile)); // delete a non-existing file
-        std::cout << newFile << std::endl;
         SSASSERT(FileSystem::MakeFile(newFile));
         SSASSERT(FileSystem::Exists(newFile));
         SSASSERT(FileSystem::IsFile(newFile));
