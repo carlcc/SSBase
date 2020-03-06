@@ -29,8 +29,6 @@ public:
 
     void Stop();
 
-    void *GetHandle();
-
     ////
     SharedPtr<TcpSocket> CreateTcpSocket();
 

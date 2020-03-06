@@ -193,12 +193,20 @@ void test_TcpSocket_client()
 {
     Loop loop;
     auto client = loop.CreateTcpSocket();
-    client->Connect("127.0.0.1", 1234, [client](int status) {
+    SSASSERT(client != nullptr);
+    SSASSERT(0 == client->Connect("127.0.0.1", 1234, [client](int status) {
         SSASSERT(status == 0);
         client->StartReceive([client](ssize_t nread, const char *buf) {
             if (nread < 0)
             {
-                std::cout << "Client Get: error" << std::endl;
+                if (nread == UV_EOF)
+                {
+                    std::cout << "Client Get: eof" << std::endl;
+                }
+                else
+                {
+                    std::cout << "Client Get: error" << std::endl;
+                }
                 return;
             }
 
@@ -208,7 +216,7 @@ void test_TcpSocket_client()
             client->Send("bye", 3, [](int status) { SSASSERT(status == 0); });
         });
         client->Send("Hello, world!", 13, [](int status) { SSASSERT(status == 0); });
-    });
+    }));
 
     loop.Run();
 
@@ -227,8 +235,8 @@ void test_TcpSocket()
 
     auto serverSocket = loop.CreateTcpSocket();
     SSASSERT(serverSocket != nullptr);
-    SSASSERT(serverSocket->Bind("0.0.0.0:1234"));
-    serverSocket->Listen(100, [](TcpSocket *server, int status) {
+    SSASSERT(0 == serverSocket->Bind("0.0.0.0:1234"));
+    SSASSERT(0 == serverSocket->Listen(100, [](TcpSocket *server, int status) {
         SSASSERT(status == 0);
         auto client = server->Accept();
         SSASSERT(client != nullptr);
@@ -236,7 +244,15 @@ void test_TcpSocket()
         client->StartReceive([client, server](ssize_t nread, const char *buf) {
             if (nread < 0)
             {
-                std::cout << "Server Get: error" << std::endl;
+
+                if (nread == UV_EOF)
+                {
+                    std::cout << "Server Get: eof" << std::endl;
+                }
+                else
+                {
+                    std::cout << "Server Get: error" << std::endl;
+                }
                 return;
             }
             std::string msg = std::string(buf, nread);
@@ -254,7 +270,7 @@ void test_TcpSocket()
             std::cout << "Server Get: " << msg << std::endl;
             client->Send(buffer, 2 * nread, [buffer](int status) { delete[] buffer; });
         });
-    });
+    }));
 
     loop.Run();
 

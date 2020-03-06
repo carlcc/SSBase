@@ -8,12 +8,12 @@
 namespace ss
 {
 
-bool TcpSocket::Bind(const String &hostAndIp)
+int TcpSocket::Bind(const String &hostAndIp)
 {
     return Bind(EndPoint(hostAndIp));
 }
 
-bool TcpSocket::Bind(const String &host, uint16_t port)
+int TcpSocket::Bind(const String &host, uint16_t port)
 {
     return Bind(EndPoint(host, port));
 }

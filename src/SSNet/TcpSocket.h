@@ -30,30 +30,31 @@ public:
 
     static const String kSigClose;
 
-    virtual bool Connect(const EndPoint &ep, OnConnectCb &&cb) = 0;
+    virtual int Connect(const EndPoint &ep, OnConnectCb &&cb) = 0;
 
-    virtual bool Connect(const String &host, uint16_t port, OnConnectCb &&cb) = 0;
+    virtual int Connect(const String &host, uint16_t port, OnConnectCb &&cb) = 0;
 
-    virtual bool Bind(const EndPoint &ep) = 0;
+    virtual int Bind(const EndPoint &ep) = 0;
 
-    bool Bind(const String &hostAndIp);
+    int Bind(const String &hostAndIp);
 
-    bool Bind(const String &host, uint16_t port) ;
+    int Bind(const String &host, uint16_t port);
 
-    virtual bool Listen(int backlog, OnConnectionCb &&cb) = 0;
+    virtual int Listen(int backlog, OnConnectionCb &&cb) = 0;
 
     virtual SharedPtr<TcpSocket> Accept() = 0;
 
     // The data pointed by `data` should keey valid untile `cb` is called.
-    virtual bool Send(const void *data, uint32_t length, OnSendCb &&cb) = 0;
+    virtual int Send(const void *data, uint32_t length, OnSendCb &&cb) = 0;
 
-    virtual bool StartReceive(OnDataCb &&cb) = 0;
+    virtual int StartReceive(OnDataCb &&cb) = 0;
 
     virtual void StopReceive() = 0;
 
     virtual void Close(OnCloseCb &&cb) = 0;
 
-    virtual bool ShutDown(OnShutDownCb &&cb) = 0;
+    virtual int ShutDown(OnShutDownCb &&cb) = 0;
+
 };
 
 } // namespace ss

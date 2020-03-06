@@ -55,14 +55,9 @@ void Loop::Stop()
     impl_->Stop();
 }
 
-void *Loop::GetHandle()
-{
-    return &impl_->loop_;
-}
-
 SharedPtr<TcpSocket> Loop::CreateTcpSocket()
 {
-    return MakeShared<TcpSocketImpl>(this);
+    return MakeShared<TcpSocketImpl>(&impl_->loop_);
 }
 
 } // namespace ss
