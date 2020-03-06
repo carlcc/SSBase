@@ -14,6 +14,7 @@
         if (!(condition))                                                                                              \
         {                                                                                                              \
             printf("%s:%d: %s got result false. ", __FILE__, __LINE__, #condition);                                    \
+            fflush(stdout);                                                                                            \
             abort();                                                                                                   \
         }                                                                                                              \
     } while (false)
@@ -24,6 +25,7 @@
         if (!(condition))                                                                                              \
         {                                                                                                              \
             printf("%s:%d: %s got result false. " msg, __FILE__, __LINE__, #condition, ##__VA_ARGS__);                 \
+            fflush(stdout);                                                                                            \
             abort();                                                                                                   \
         }                                                                                                              \
     } while (false)

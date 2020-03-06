@@ -66,3 +66,14 @@ cmake .. -DENABLE_COMMONCRYPTO=OFF \
          -DCMAKE_FIND_ROOT_PATH="${THIRDPARTY_ROOT}/lib" \
          -DCMAKE_INSTALL_PREFIX="${THIRDPARTY_ROOT}"
 make -j 4 && make install
+
+echo "== Building libuv..."
+cd "${THIRDPARTY_ROOT}" || exit
+tar xfp libuv-1.34.2.tar.gz
+cd libuv-1.34.2 || exit
+mkdir build
+cd build || exit
+cmake .. -DLIBUV_BUILD_TESTS=OFF \
+         -DCMAKE_FIND_ROOT_PATH="${THIRDPARTY_ROOT}/lib" \
+         -DCMAKE_INSTALL_PREFIX="${THIRDPARTY_ROOT}"
+cmake -j 4 && make install

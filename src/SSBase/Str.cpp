@@ -125,8 +125,10 @@ struct utf8 final
                 goto _err;
             return (ch0 << 30) + (ch1 << 24) + (ch2 << 18) + (ch3 << 12) + (ch4 << 6) + ch5 - 0x82082080;
         }
-        throw std::runtime_error("The utf8 first char in sequence is incorrect");
+        return -1;
+        // throw std::runtime_error("The utf8 first char in sequence is incorrect");
     _err:
+        //        return -1;
         throw std::runtime_error("The utf8 slave char in sequence is incorrect");
     }
 
@@ -184,6 +186,11 @@ struct CharSequence::SequenceData
         chars_ = static_cast<CharType *>(malloc(length * sizeof(CharType)));
     }
 
+    SequenceData(const SequenceData &) = delete;
+    SequenceData(SequenceData &&) = delete;
+    SequenceData &operator=(const SequenceData &) = delete;
+    SequenceData &operator=(SequenceData &&) = delete;
+
     ~SequenceData()
     {
         free(chars_);
@@ -192,16 +199,6 @@ struct CharSequence::SequenceData
     void ReAllocate(uint32_t length)
     {
         chars_ = static_cast<CharType *>(realloc(chars_, length * sizeof(CharType)));
-    }
-
-    static SequenceData *New(uint32_t length)
-    {
-        return new SequenceData(length);
-    }
-
-    static void Delete(SequenceData *sd)
-    {
-        delete sd;
     }
 };
 

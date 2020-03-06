@@ -5,6 +5,7 @@
 
 #include "test_archive.h"
 #include "test_filesystem.h"
+#include "test_net.h"
 #include "test_reflection.h"
 #include "test_signal.h"
 #include "test_stream.h"
@@ -29,6 +30,8 @@ int main()
     TestStream::test();
 
     TestArchive::test();
+
+    TestNet::test();
 
     std::cout << "end main" << std::endl;
 
