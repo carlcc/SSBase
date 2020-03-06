@@ -1,7 +1,11 @@
 #pragma once
 
 #include <SSNet/EndPoint.h>
+#include <SSNet/Loop.h>
+#include <SSNet/TcpSocket.h>
+#include <thread>
 #include <uv.h>
+
 namespace TestNet
 {
 
@@ -9,7 +13,6 @@ using namespace ss;
 
 void test_EndPoint()
 {
-
     {
         EndPoint ep("1.2.3.4:13");
         SSASSERT(ep.IP() == "1.2.3.4");
@@ -186,9 +189,84 @@ void test_EndPoint()
     }
 }
 
+void test_TcpSocket_client()
+{
+    Loop loop;
+    auto client = loop.CreateTcpSocket();
+    client->Connect("127.0.0.1", 1234, [client](int status) {
+        SSASSERT(status == 0);
+        client->StartReceive([client](ssize_t nread, const char *buf) {
+            if (nread < 0)
+            {
+                std::cout << "Client Get: error" << std::endl;
+                return;
+            }
+
+            std::string msg(buf, nread);
+            std::cout << "Client Get: " << msg << std::endl;
+
+            client->Send("bye", 3, [](int status) { SSASSERT(status == 0); });
+        });
+        client->Send("Hello, world!", 13, [](int status) { SSASSERT(status == 0); });
+    });
+
+    loop.Run();
+
+    std::cout << "Client exit" << std::endl;
+}
+
+void test_TcpSocket()
+{
+    std::thread clientThread([]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        test_TcpSocket_client();
+    });
+
+    // Server thread
+    Loop loop;
+
+    auto serverSocket = loop.CreateTcpSocket();
+    SSASSERT(serverSocket != nullptr);
+    SSASSERT(serverSocket->Bind("0.0.0.0:1234"));
+    serverSocket->Listen(100, [](TcpSocket *server, int status) {
+        SSASSERT(status == 0);
+        auto client = server->Accept();
+        SSASSERT(client != nullptr);
+
+        client->StartReceive([client, server](ssize_t nread, const char *buf) {
+            if (nread < 0)
+            {
+                std::cout << "Server Get: error" << std::endl;
+                return;
+            }
+            std::string msg = std::string(buf, nread);
+
+            if (msg == "bye")
+            {
+                client->Close(nullptr);
+                server->Close(nullptr);
+                return;
+            }
+
+            char *buffer = new char[1024];
+            memcpy(buffer, buf, nread);
+            memcpy(buffer + nread, buf, nread);
+            std::cout << "Server Get: " << msg << std::endl;
+            client->Send(buffer, 2 * nread, [buffer](int status) { delete[] buffer; });
+        });
+    });
+
+    loop.Run();
+
+    std::cout << "Server exit" << std::endl;
+    clientThread.join();
+}
+
 bool test()
 {
     test_EndPoint();
+
+    test_TcpSocket();
 
     return true;
 }

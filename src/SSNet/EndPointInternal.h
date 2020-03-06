@@ -13,6 +13,7 @@ namespace ss
 struct EndPoint::Impl
 {
     union {
+        sockaddr addr_;
         sockaddr_in6 addr6_;
         sockaddr_in addr4_;
     };
