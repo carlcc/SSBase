@@ -74,9 +74,9 @@ bool test()
         ss::SharedPtr<Light> light1 = ss::MakeShared<Light>(2);
         ss::SharedPtr<Light> light2 = ss::MakeShared<Light>(3);
         ss::SharedPtr<Fan> fan = ss::MakeShared<Fan>();
-        switcher->Connect("toggle", light1, &Light::handleSwitch);
-        switcher->Connect("toggle", light2, &Light::handleSwitch);
-        switcher->Connect("toggle", fan, &Fan::handleSwitch);
+        switcher->SignalConnect("toggle", light1, &Light::handleSwitch);
+        switcher->SignalConnect("toggle", light2, &Light::handleSwitch);
+        switcher->SignalConnect("toggle", fan, &Fan::handleSwitch);
 
         ss::VariantMap params;
         params["msg"] = "'Greeting msg!'";
@@ -85,13 +85,13 @@ bool test()
             gOutput << "======" << i << std::endl;
             if (i == 5)
             {
-                switcher->Disconnect("toggle", fan);
+                switcher->SignalDisconnect("toggle", fan);
             }
             if (i == 6)
             {
                 light2 = nullptr;
             }
-            switcher->Emit("toggle", params);
+            switcher->SignalEmit("toggle", params);
         }
     }
 

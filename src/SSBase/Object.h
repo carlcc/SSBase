@@ -125,34 +125,34 @@ public:
         return signals_;
     }
 
-    template <class T> void Connect(const String &signal, T *obj, void (T::*handler)(VariantMap &))
+    template <class T> void SignalConnect(const String &signal, T *obj, void (T::*handler)(VariantMap &))
     {
         signals_[signal].connect(obj, handler);
     }
 
-    template <class T> void Connect(const String &signal, SharedPtr<T> obj, void (T::*handler)(VariantMap &))
+    template <class T> void SignalConnect(const String &signal, SharedPtr<T> obj, void (T::*handler)(VariantMap &))
     {
         signals_[signal].connect(obj.Get(), handler);
     }
 
-    template <class T> void Disconnect(const String &signal, T *obj)
+    template <class T> void SignalDisconnect(const String &signal, T *obj)
     {
         signals_[signal].disconnect(obj);
     }
 
-    template <class T> void Disconnect(const String &signal, SharedPtr<T> obj)
+    template <class T> void SignalDisconnect(const String &signal, SharedPtr<T> obj)
     {
         signals_[signal].disconnect(obj.Get());
     }
 
-    void DisconnectAll(const String &signal);
+    void SignalDisconnectAll(const String &signal);
 
-    void DisconnectAll();
+    void SignalDisconnectAll();
 
-    void Emit(const String &signal, VariantMap &params);
+    void SignalEmit(const String &signal, VariantMap &params);
 
     // TODO: how to manage the dummy object's life cycle?
-    // void Connect(const String &signal, std::function<void(VariantMap &)> &&handler)
+    // void SignalConnect(const String &signal, std::function<void(VariantMap &)> &&handler)
     // {
     //     struct Dummy : public sigslot::has_slots<>
     //     {
@@ -168,7 +168,7 @@ public:
     //
     //         std::function<void(VariantMap &)> handler_;
     //     };
-    //     Connect(signal, new Dummy(std::forward<std::function<void(VariantMap &)>>(handler)), &Dummy::handle);
+    //     SignalConnect(signal, new Dummy(std::forward<std::function<void(VariantMap &)>>(handler)), &Dummy::handle);
     // }
 
 private:

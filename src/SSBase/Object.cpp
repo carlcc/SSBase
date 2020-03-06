@@ -52,17 +52,17 @@ PropertyMap Object::RegisterProperties()
     return propertyMap;
 }
 
-void Object::DisconnectAll(const String &signal)
+void Object::SignalDisconnectAll(const String &signal)
 {
     signals_[signal].disconnect_all();
 }
 
-void Object::DisconnectAll()
+void Object::SignalDisconnectAll()
 {
     signals_.clear();
 }
 
-void Object::Emit(const String &signal, VariantMap &params)
+void Object::SignalEmit(const String &signal, VariantMap &params)
 {
     auto it = signals_.find(signal);
     if (it == signals_.end())
