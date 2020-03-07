@@ -194,7 +194,9 @@ void test_TcpSocket_client()
     Loop loop;
     auto client = loop.CreateTcpSocket();
     SSASSERT(client != nullptr);
-    SSASSERT(0 == client->Connect("127.0.0.1", 1234, [client](int status) {
+    // Use this variable, if we put this lambda directly as function arguments,
+    // VS would do optimize which cause this callback be wiped out, why? Strange...
+    auto cb = [client](int status) {
         SSASSERT(status == 0);
         client->StartReceive([client](ssize_t nread, const char *buf) {
             if (nread < 0)
@@ -216,7 +218,8 @@ void test_TcpSocket_client()
             client->Send("bye", 3, [](int status) { SSASSERT(status == 0); });
         });
         client->Send("Hello, world!", 13, [](int status) { SSASSERT(status == 0); });
-    }));
+    };
+    SSASSERT(0 == client->Connect("127.0.0.1", 1234, cb));
 
     loop.Run();
 
@@ -236,7 +239,9 @@ void test_TcpSocket()
     auto serverSocket = loop.CreateTcpSocket();
     SSASSERT(serverSocket != nullptr);
     SSASSERT(0 == serverSocket->Bind("0.0.0.0:1234"));
-    SSASSERT(0 == serverSocket->Listen(100, [](TcpSocket *server, int status) {
+    // Use this variable, if we put this lambda directly as function arguments,
+    // VS would do optimize which cause this callback be wiped out, why? Strange...
+    auto cb = [](TcpSocket *server, int status) {
         SSASSERT(status == 0);
         auto client = server->Accept();
         SSASSERT(client != nullptr);
@@ -270,7 +275,8 @@ void test_TcpSocket()
             std::cout << "Server Get: " << msg << std::endl;
             client->Send(buffer, 2 * nread, [buffer](int status) { delete[] buffer; });
         });
-    }));
+    };
+    SSASSERT(0 == serverSocket->Listen(100, cb));
 
     loop.Run();
 

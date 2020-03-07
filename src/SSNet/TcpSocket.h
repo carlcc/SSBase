@@ -7,6 +7,7 @@
 #include "../SSBase/Object.h"
 #include "../SSBase/Ptr.h"
 #include <functional>
+#include <uv.h>
 
 namespace ss
 {

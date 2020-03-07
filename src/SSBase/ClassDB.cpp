@@ -14,7 +14,7 @@ class ClassDBImpl
     {
         size_t operator()(const String &s) const
         {
-            return s.Hash();
+            return size_t(s.Hash());
         }
     };
     using CtorMap = std::unordered_map<String, ClassDB::ObjectCtor, StringHasher>;

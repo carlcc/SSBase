@@ -46,7 +46,7 @@ int32_t BufferedOutputStream::Write(const void *data, uint32_t count)
             return ret;
         }
 
-        if (ret < buffer_.Size())
+        if (uint32_t(ret) < buffer_.Size())
         {
             buffer_.Skip(ret);
             // Keep it simple, if not all the data were written, just return
@@ -66,7 +66,7 @@ int32_t BufferedOutputStream::Write(const void *data, uint32_t count)
     {
         return ret;
     }
-    if (ret < buffer_.Size())
+    if (uint32_t(ret) < buffer_.Size())
     {
         buffer_.Skip(ret);
         // There are at least `freeSpace` bytes spare space in out buffer
@@ -90,7 +90,7 @@ int32_t BufferedOutputStream::Flush()
     {
         return ret;
     }
-    if (ret < buffer_.Size())
+    if (uint32_t(ret) < buffer_.Size())
     {
         buffer_.Skip(ret);
         // Not all data were flushed

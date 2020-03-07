@@ -197,7 +197,7 @@ void EndPoint::InitWithString(const CharSequence &ipAndPort)
             return;
         }
         StringView ip = ipAndPort.SubStringView(startIndex + 1, endIndex - startIndex - 1);
-        auto port = Convert::StringTo<u_int16_t>(ipAndPort.SubStringView(endIndex + 2));
+        auto port = Convert::StringTo<int16_t>(ipAndPort.SubStringView(endIndex + 2));
         InitWithIpAndPort(ip, port);
     }
 }

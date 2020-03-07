@@ -52,7 +52,7 @@ public:
         }
 
         available_ -= size;
-        return size;
+        return int32_t(size);
     }
 
     int64_t Skip(int64_t n) override
@@ -62,7 +62,7 @@ public:
 
     int32_t Available() const override
     {
-        return available_;
+        return int32_t(available_);
     }
 
     void Close() override
@@ -129,7 +129,7 @@ public:
             auto numEntries = zip_get_num_entries(archive_, 0);
             if (numEntries > 0)
             {
-                entries_.reserve(numEntries);
+                entries_.reserve(size_t(numEntries));
                 for (int64_t i = 0; i < numEntries; ++i)
                 {
                     entries_.emplace_back(zip_get_name(archive_, i, 0));

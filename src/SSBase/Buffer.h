@@ -190,13 +190,13 @@ public:
 
     uint8_t operator[](int32_t index) const
     {
-        SSASSERT(index >= 0 && index < Size());
+        SSASSERT(index >= 0 && uint32_t(index) < Size());
         return GetData<uint8_t>()[index];
     }
 
     uint8_t &operator[](int32_t index)
     {
-        SSASSERT(index >= 0 && index < Size());
+        SSASSERT(index >= 0 && uint32_t(index) < Size());
         return GetData<uint8_t>()[index];
     }
 
