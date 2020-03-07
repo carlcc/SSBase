@@ -3,8 +3,10 @@
 //
 #include "FileSystem.h"
 
-#ifdef SS_PLAFORM_WIN32
-#error not yet implemented
+#ifdef SS_PLATFORM_WIN32
+#include <direct.h>
+#include <Windows.h>
+#include <io.h>
 #elif defined(SS_PLATFORM_UNIX)
 #include <dirent.h>
 #include <sys/stat.h>
@@ -25,16 +27,14 @@ const char FileSystem::kInternalSeparator = '/';
 // Return current working directory
 String FileSystem::GetCWD(bool internalSeparator)
 {
-    String result;
-
-#ifdef SS_PLAFORM_WIN32
-#error Not yet implemented
+#ifdef SS_PLATFORM_WIN32
+    wchar_t buffer[4096];
+    wchar_t* p = _wgetcwd(buffer, sizeof(buffer) / sizeof(buffer[0]));
 #else
     char buffer[4096];
-    char *p = getcwd(buffer, sizeof(buffer));
-    result = buffer;
-    return NormalizePath(String(p), internalSeparator);
+    char *p = getcwd(buffer, sizeof(buffer) / sizeof(buffer[0]));
 #endif
+    return NormalizePath(String(p), internalSeparator);
 }
 
 String FileSystem::GetRelativePath(const CharSequence &path, const CharSequence &relativeTo, bool internalSeparator)
@@ -111,8 +111,7 @@ String FileSystem::NormalizePath(const CharSequence &path, bool internalSeparato
     NormalizeSeparatorInternal(p, separator);
     if (IsAbsolutePath(p))
     {
-#ifdef SS_PLAFORM_WIN32
-#error Not yet implemented
+#ifdef SS_PLATFORM_WIN32
         return p.SubStringView(0, 2) + separator + RemoveDotDotInternal(p.SubStringView(3), separator);
 #else
         return separator + RemoveDotDotInternal(p.SubStringView(1), separator);
@@ -198,7 +197,9 @@ bool FileSystem::IsFile(const CharSequence &path)
     stat(path.ToStdString().c_str(), &statBuf);
     return S_ISREG(statBuf.st_mode);
 #else
-#error not yet implemented
+    struct _stat statBuf;
+    _wstat(path.ToStdWString().c_str(), &statBuf);
+    return _S_IFREG & statBuf.st_mode;
 #endif
 }
 
@@ -209,7 +210,9 @@ bool FileSystem::IsDirectory(const CharSequence &path)
     stat(path.ToStdString().c_str(), &statBuf);
     return S_ISDIR(statBuf.st_mode);
 #else
-#error not yet implemented
+    struct _stat statBuf;
+    _wstat(path.ToStdWString().c_str(), &statBuf);
+    return _S_IFDIR & statBuf.st_mode;
 #endif
 }
 
@@ -218,7 +221,8 @@ bool FileSystem::IsHidden(const CharSequence &path)
 #ifdef SS_PLATFORM_UNIX
     return GetFileName(path).StartsWith(".");
 #else
-#error not yet implemented
+    DWORD attributes = GetFileAttributesW(path.ToStdWString().c_str());
+    return attributes & FILE_ATTRIBUTE_HIDDEN;
 #endif
 }
 
@@ -227,13 +231,22 @@ bool FileSystem::Exists(const CharSequence &path)
 #ifdef SS_PLATFORM_UNIX
     return access(path.ToStdString().c_str(), F_OK) != -1;
 #else
-#error not yet implemented
+    return _waccess(path.ToStdWString().c_str(), 0) != -1;
 #endif
 }
 
 bool FileSystem::MakeFile(const CharSequence &path)
 {
+    if (Exists(path))
+    {
+        return false;
+    }
+#ifdef SS_PLATFORM_UNIX
     FILE *f = fopen(path.ToStdString().c_str(), "a");
+#else
+    FILE *f = _wfopen(path.ToStdWString().c_str(), L"a");
+#endif // SS_PLATFORM_UNIX
+
     if (f != nullptr)
     {
         fclose(f);
@@ -247,7 +260,7 @@ bool FileSystem::MakeDir(const CharSequence &path)
 #ifdef SS_PLATFORM_UNIX
     return 0 == mkdir(path.ToStdString().c_str(), 0755);
 #else
-#error not yet implemented
+    return 0 == _wmkdir(path.ToStdWString().c_str());
 #endif
 }
 
@@ -290,34 +303,49 @@ bool FileSystem::MakeDirs(const CharSequence &path)
 
 bool FileSystem::Rename(const CharSequence &from, const CharSequence &to)
 {
-    return rename(from.ToStdString().c_str(), to.ToStdString().c_str()) == 0;
+    return _wrename(from.ToStdWString().c_str(), to.ToStdWString().c_str()) == 0;
 }
 
 bool FileSystem::Delete(const CharSequence &path, bool recursive)
 {
-    if (recursive && IsDirectory(path))
+    if (IsDirectory(path))
     {
-        std::vector<String> files = ListFiles(path);
-        for (auto &f : files)
+        if (recursive)
         {
-            if (!Delete(f, true))
+            std::string p = path.ToStdString();
+            std::vector<String> files = ListFiles(path);
+            for (auto &f : files)
             {
-                return false;
+                if (!Delete(f, true))
+                {
+                    return false;
+                }
             }
         }
+#ifdef SS_PLATFORM_UNIX
+        return remove(path.ToStdString().c_str()) == 0;
+#else
+        return RemoveDirectoryW(path.ToStdWString().c_str());
+#endif
     }
-
-    return remove(path.ToStdString().c_str()) == 0;
+    else
+    {
+#ifdef SS_PLATFORM_UNIX
+        return remove(path.ToStdString().c_str()) == 0;
+#else
+        return DeleteFileW(path.ToStdWString().c_str());
+#endif
+    }
 }
 
 std::vector<String> FileSystem::ListFiles(const CharSequence &path, bool internalSeparator,
                                           const FileSystem::FilePathFilter &filter)
 {
-#ifdef SS_PLATFORM_UNIX
-    std::vector<String> result;
-
     const char separator = internalSeparator ? kInternalSeparator : kSeparator;
     String normalizedPath = NormalizePath(path, internalSeparator);
+
+#ifdef SS_PLATFORM_UNIX
+    std::vector<String> result;
 
     DIR *dir = opendir(path.ToStdString().c_str());
     if (dir == nullptr)
@@ -346,7 +374,35 @@ std::vector<String> FileSystem::ListFiles(const CharSequence &path, bool interna
     closedir(dir);
     return result;
 #else
-#error not yet implemented
+    WIN32_FIND_DATAW fdFile;
+    HANDLE hFind = NULL;
+
+    //Specify a file mask. *.* = We want everything!
+    std::wstring pattern = (normalizedPath + "\\*").ToStdWString();
+
+    std::vector<String> result;
+    if ((hFind = FindFirstFileW(pattern.c_str(), &fdFile)) == INVALID_HANDLE_VALUE)
+    {
+        return result;
+    }
+
+    for (bool run = true; run; run = FindNextFileW(hFind, &fdFile))
+    {
+        if (wcscmp(fdFile.cFileName, L".") == 0 || wcscmp(fdFile.cFileName, L"..") == 0)
+        {
+            continue;
+        }
+        String name = normalizedPath + separator + fdFile.cFileName;
+        if (filter != nullptr && !filter(name))
+        {
+            continue;
+        }
+        result.push_back(std::move(name));
+    }
+
+    FindClose(hFind);
+
+    return result;
 #endif
 }
 
@@ -379,7 +435,35 @@ std::vector<String> FileSystem::ListFileNames(const CharSequence &path, const Fi
     closedir(dir);
     return result;
 #else
-#error not yet implemented
+    WIN32_FIND_DATAW fdFile;
+    HANDLE hFind = NULL;
+
+    //Specify a file mask. *.* = We want everything!
+    std::wstring pattern = (path + "\\*").ToStdWString();
+
+    std::vector<String> result;
+    if ((hFind = FindFirstFileW(pattern.c_str(), &fdFile)) == INVALID_HANDLE_VALUE)
+    {
+        return result;
+    }
+
+    for (bool run = true; run; run = FindNextFileW(hFind, &fdFile))
+    {
+        if (wcscmp(fdFile.cFileName, L".") == 0 || wcscmp(fdFile.cFileName, L"..") == 0)
+        {
+            continue;
+        }
+        String name = fdFile.cFileName;
+        if (filter != nullptr && !filter(name))
+        {
+            continue;
+        }
+        result.push_back(std::move(name));
+    }
+
+    FindClose(hFind);
+
+    return result;
 #endif
 }
 

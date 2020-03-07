@@ -8,15 +8,15 @@
 #include <SSIO/stream/BufferedInputStream.h>
 #include <SSIO/stream/InputStream.h>
 #include <SSIO/stream/StreamConstant.h>
+#include <SSIO/file/FileSystem.h>
 
 namespace TestArchive
 {
 bool test()
 {
     using namespace ss;
-    String path = __FILE__;
-    StringView path2 = path.SubStringView(0, path.RFind("/"));
-    Archive archive(path2 + "/a.zip");
+    String path = FileSystem::GetParent(__FILE__);
+    Archive archive(path + "/a.zip");
 
     auto &entries = archive.GetEntries();
     for (auto &e : entries)

@@ -2,7 +2,6 @@
 // Copyright (c) 2020 Carl Chen. All rights reserved.
 //
 #include <iostream>
-
 #include "test_archive.h"
 #include "test_filesystem.h"
 #include "test_net.h"
@@ -13,7 +12,7 @@
 #include "test_variant.h"
 #include "testrefcounter.h"
 
-int main()
+int main(int argc, char **argv)
 {
     TestString::test();
 
@@ -27,7 +26,7 @@ int main()
 
     TestFileSystem::test();
 
-    TestStream::test();
+    TestStream::test(argc, argv);
 
     TestArchive::test();
 

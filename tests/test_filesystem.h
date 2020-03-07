@@ -140,18 +140,31 @@ bool test()
     using namespace ss;
     String cwd = FileSystem::GetCWD();
 
+#ifdef SS_PLATFORM_WIN32
+    SSASSERT(FileSystem::IsAbsolutePath("C:/fdsaf/d/saf/ds/af/ds/f"));
+    SSASSERT(FileSystem::IsAbsolutePath("z:/fdsaf/d/saf/ds/af/ds/f"));
+    SSASSERT(FileSystem::IsAbsolutePath("c:\\//fdsaf/d/saf/ds/af/ds/f"));
+    SSASSERT(FileSystem::IsAbsolutePath("d:\\//fdsaf/d/saf/ds/af/ds/f"));
+    SSASSERT(FileSystem::IsAbsolutePath("e:/fdsaf/d/saf/ds/af/ds/"));
+    SSASSERT("C:/fdsaf/d/saf/ds/af/ds/f" == FileSystem::NormalizePath("C:/fdsaf/d/saf/ds/af/ds/f"));
+    SSASSERT("C:/fdsaf/d/saf/ds/af/ds/f" == FileSystem::NormalizePath("C:\\//fdsaf/d/saf/ds/af/ds/f"));
+    SSASSERT("C:/fdsaf/ds/ds/f" == FileSystem::NormalizePath("C:/fdsaf/d/../ds/af/../ds/f"));
+    SSASSERT("C:/" == FileSystem::NormalizePath("C:/fdsaf/d/../ds/af/../ds/f/../../../.."));
+    SSASSERT("C:/.." == FileSystem::NormalizePath("C:/fdsaf/d/../ds/af/../ds/f/../../../../.."));
+#else
     SSASSERT(FileSystem::IsAbsolutePath("/fdsaf/d/saf/ds/af/ds/f"));
     SSASSERT(FileSystem::IsAbsolutePath("\\//fdsaf/d/saf/ds/af/ds/f"));
-    SSASSERT(!FileSystem::IsAbsolutePath("af/ds/af/ds/f"));
-    SSASSERT(!FileSystem::IsAbsolutePath("./fdsaf/d/saf/ds/af/ds/f"));
-    SSASSERT(!FileSystem::IsAbsolutePath(""));
     SSASSERT(FileSystem::IsAbsolutePath("/fdsaf/d/saf/ds/af/ds/"));
-
     SSASSERT("/fdsaf/d/saf/ds/af/ds/f" == FileSystem::NormalizePath("/fdsaf/d/saf/ds/af/ds/f"));
     SSASSERT("/fdsaf/d/saf/ds/af/ds/f" == FileSystem::NormalizePath("\\//fdsaf/d/saf/ds/af/ds/f"));
     SSASSERT("/fdsaf/ds/ds/f" == FileSystem::NormalizePath("/fdsaf/d/../ds/af/../ds/f"));
     SSASSERT("/" == FileSystem::NormalizePath("/fdsaf/d/../ds/af/../ds/f/../../../.."));
     SSASSERT("/.." == FileSystem::NormalizePath("/fdsaf/d/../ds/af/../ds/f/../../../../.."));
+#endif
+    SSASSERT(!FileSystem::IsAbsolutePath("af/ds/af/ds/f"));
+    SSASSERT(!FileSystem::IsAbsolutePath("./fdsaf/d/saf/ds/af/ds/f"));
+    SSASSERT(!FileSystem::IsAbsolutePath(""));
+
     SSASSERT("af/ds/af/ds/f" == FileSystem::NormalizePath("af/ds/af/ds/f"));
     SSASSERT("af/ds/af/ds/f" == FileSystem::NormalizePath("af/ds/af/ds/f"));
     SSASSERT("af/ds/af/ds/f" == FileSystem::NormalizePath("af/ds/af/ds/f/"));
