@@ -10,17 +10,12 @@ namespace ss
 
 FileOutputStream::FileOutputStream(const CharSequence &file) : filePtr_(nullptr)
 {
-    new (this) FileOutputStream(file.ToStdString().c_str());
+    Init(file);
 }
 
-FileOutputStream::FileOutputStream(const std::string &file) : filePtr_(nullptr)
+FileOutputStream::FileOutputStream(const String &file) : filePtr_(nullptr)
 {
-    new (this) FileOutputStream(file.c_str());
-}
-
-FileOutputStream::FileOutputStream(const char *file) : filePtr_(nullptr)
-{
-    filePtr_ = fopen(file, "wb");
+    Init(file);
 }
 
 FileOutputStream::~FileOutputStream()
@@ -67,6 +62,15 @@ int32_t FileOutputStream::Flush()
         return StreamConstant::ErrorCode::kOk;
     }
     return StreamConstant::ErrorCode::kUnknown;
+}
+
+void FileOutputStream::Init(const CharSequence &file)
+{
+#ifdef SS_PLATFORM_UNIX
+    filePtr_ = fopen(file.ToStdString().c_str(), "wb");
+#else
+    filePtr_ = _wfopen(file.ToStdWString().c_str(), L"wb");
+#endif
 }
 
 } // namespace ss

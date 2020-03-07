@@ -13,12 +13,12 @@
 namespace TestStream
 {
 
-bool test()
+bool test(int argc, char **argv)
 {
     using namespace ss;
-    SharedPtr<InputStream> fis1 = MakeShared<FileInputStream>("/Users/chenchen02/lz4-1.9.2.tar.gz");
+    SharedPtr<InputStream> fis1 = MakeShared<FileInputStream>(argv[0]);
     SharedPtr<OutputStream> fos1 =
-        MakeShared<FileOutputStream>("/Users/chenchen02/lz4-1.9.2.tar.gz" + std::string(".copy"));
+        MakeShared<FileOutputStream>(argv[0] + String(".copy"));
 
     auto fis = MakeShared<BufferedInputStream>(fis1);
     auto fos = MakeShared<BufferedOutputStream>(fos1);
@@ -39,4 +39,4 @@ bool test()
     return true;
 }
 
-}
+} // namespace TestStream

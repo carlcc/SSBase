@@ -10,6 +10,21 @@
 #include <cwchar>
 #include <unordered_set>
 
+#ifdef SS_PLATFORM_WIN32
+#include <Windows.h>
+
+namespace ss {
+// To make windows console print utf8 strings properly
+class WindowsUtf8ConsoleHelper {
+public:
+    WindowsUtf8ConsoleHelper() {
+        SetConsoleOutputCP(CP_UTF8);
+    }
+};
+static WindowsUtf8ConsoleHelper __windowsUtf8ConsoleHelper;
+}
+#endif
+
 namespace ss
 {
 
@@ -546,8 +561,18 @@ std::string CharSequence::ToStdString(CharSequence::CharSet charSet) const
 {
     uint32_t utf8Length = GetBytesLength(charSet);
 
-    std::string ss(utf8Length, L'\0');
+    std::string ss(utf8Length, '\0');
     GetBytes(CharSequence::kUtf8, const_cast<char *>(ss.data()));
+    return ss;
+}
+
+std::wstring CharSequence::ToStdWString() const
+{
+    std::wstring ss(Length(), L'\0');
+    for (uint32_t i = 0; i < Length(); ++i)
+    {
+        ss[i] = At(i);
+    }
     return ss;
 }
 

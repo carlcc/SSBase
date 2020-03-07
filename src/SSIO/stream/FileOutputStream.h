@@ -16,9 +16,7 @@ class FileOutputStream : public OutputStream
 public:
     explicit FileOutputStream(const CharSequence &file);
 
-    explicit FileOutputStream(const std::string &file);
-
-    explicit FileOutputStream(const char *file);
+    explicit FileOutputStream(const String &file);
 
     ~FileOutputStream() override;
 
@@ -30,6 +28,9 @@ public:
 
     bool IsValid() const override;
     int32_t Flush() override;
+
+private:
+    void Init(const CharSequence &file);
 
 private:
     FILE *filePtr_;

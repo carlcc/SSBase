@@ -7,25 +7,14 @@
 
 namespace ss
 {
-FileInputStream::FileInputStream(const CharSequence &file)
+FileInputStream::FileInputStream(const CharSequence &file) : filePtr_(nullptr), totalFileSize_(0)
 {
-    new (this) FileInputStream(file.ToStdString().c_str());
+    Init(file);
 }
 
-FileInputStream::FileInputStream(const std::string &file) : filePtr_(nullptr), totalFileSize_(0)
+FileInputStream::FileInputStream(const String &file) : filePtr_(nullptr), totalFileSize_(0)
 {
-    new (this) FileInputStream(file.c_str());
-}
-
-FileInputStream::FileInputStream(const char *file) : filePtr_(nullptr), totalFileSize_(0)
-{
-    filePtr_ = fopen(file, "rb");
-    if (filePtr_)
-    {
-        fseek(filePtr_, 0, SEEK_END);
-        totalFileSize_ = ftell(filePtr_);
-        fseek(filePtr_, 0, SEEK_SET);
-    }
+    Init(file);
 }
 
 FileInputStream::~FileInputStream()
@@ -66,7 +55,7 @@ int64_t FileInputStream::Skip(int64_t n)
         return 0;
     }
     int64_t pos = ftell(filePtr_);
-    if (0 == fseek(filePtr_, n, SEEK_CUR))
+    if (0 == fseek(filePtr_, long(n), SEEK_CUR))
     {
         // Success
         return ftell(filePtr_) - pos;
@@ -77,7 +66,7 @@ int64_t FileInputStream::Skip(int64_t n)
 int32_t FileInputStream::Available() const
 {
     SSASSERT(filePtr_ != nullptr);
-    return totalFileSize_ - ftell(filePtr_);
+    return int32_t(totalFileSize_ - ftell(filePtr_));
 }
 
 void FileInputStream::Close()
@@ -119,11 +108,26 @@ int FileInputStream::Seek(int64_t offset, SeekableInputStream::Whence whence)
     default:
         SSASSERT(false);
     }
-    if (0 == fseek(filePtr_, offset, wc))
+    if (0 == fseek(filePtr_, long(offset), wc))
     {
         return StreamConstant::ErrorCode::kOk;
     }
     return StreamConstant::ErrorCode::kUnknown;
+}
+
+void FileInputStream::Init(const CharSequence &file)
+{
+#ifdef SS_PLATFORM_UNIX
+    filePtr_ = fopen(file.ToStdString().c_str(), "rb");
+#else
+    filePtr_ = _wfopen(file.ToStdWString().c_str(), L"rb");
+#endif
+    if (filePtr_)
+    {
+        fseek(filePtr_, 0, SEEK_END);
+        totalFileSize_ = ftell(filePtr_);
+        fseek(filePtr_, 0, SEEK_SET);
+    }
 }
 
 } // namespace ss

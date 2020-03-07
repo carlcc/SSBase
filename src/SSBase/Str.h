@@ -28,8 +28,7 @@ public:
     };
     enum CharSet
     {
-        kUtf8,
-        kLocale = kUtf8
+        kUtf8
     };
 
     static bool IsAsciiAlpha(CharType c);
@@ -174,7 +173,8 @@ public:
     /// NOTE: This function assumes the buffer is big enough, you can check the required size by invoking
     /// `GetBytesLength` function.
     void GetBytes(CharSet charSet, void *buffer) const;
-    std::string ToStdString(CharSet charSet = kLocale) const;
+    std::string ToStdString(CharSet charSet = kUtf8) const;
+    std::wstring ToStdWString() const;
 
     uint64_t Hash() const;
 

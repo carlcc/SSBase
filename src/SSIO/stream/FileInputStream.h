@@ -18,9 +18,7 @@ class FileInputStream : public SeekableInputStream
 public:
     explicit FileInputStream(const CharSequence &file);
 
-    explicit FileInputStream(const std::string &file);
-
-    explicit FileInputStream(const char *file);
+    explicit FileInputStream(const String &file);
 
     ~FileInputStream() override;
 
@@ -39,6 +37,9 @@ public:
     std::string ReadAll();
 
     int Seek(int64_t offset, Whence whence) override;
+
+private:
+    void Init(const CharSequence &file);
 
 private:
     FILE *filePtr_;
