@@ -1,8 +1,11 @@
 #pragma once
 
+#include <SSNet/AsyncTcpSocket.h>
 #include <SSNet/EndPoint.h>
 #include <SSNet/Loop.h>
-#include <SSNet/AsyncTcpSocket.h>
+#include <SSNet/TcpSocket.h>
+#include <condition_variable>
+#include <mutex>
 #include <thread>
 #include <uv.h>
 
@@ -273,7 +276,7 @@ void test_AsyncTcpSocket()
             memcpy(buffer, buf, nread);
             memcpy(buffer + nread, buf, nread);
             std::cout << "Server Get: " << msg << std::endl;
-            client->Send(buffer, 2 * nread, [buffer](int status) { delete[] buffer; });
+            client->Send(buffer, 2 * uint32_t(nread), [buffer](int status) { delete[] buffer; });
         });
     };
     SSASSERT(0 == serverSocket->Listen(100, cb));
@@ -284,11 +287,145 @@ void test_AsyncTcpSocket()
     clientThread.join();
 }
 
+int64_t steadyTimeMillis()
+{
+    using namespace std::chrono;
+    return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
+}
+
+void test_TcpSocket()
+{
+    int signalCounter = 0;
+    std::mutex mutex;
+    std::condition_variable cv;
+
+    auto signal = [&]() {
+        std::unique_lock<std::mutex> lck(mutex);
+        signalCounter++;
+        cv.notify_one();
+    };
+    auto wait = [&] {
+        std::unique_lock<std::mutex> lck(mutex);
+        cv.wait(lck, [&]() { return signalCounter > 0; });
+        --signalCounter;
+    };
+
+    std::thread clientThread([&]() {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        auto client = TcpSocket::CreateSocket();
+        SSASSERT(client != nullptr);
+        SSASSERT(client->Connect("127.0.0.1", 1234) == 0);
+        char buf[1024] = "hello, world!";
+        auto len = (uint32_t)strlen(buf);
+        SSASSERT(client->Send(buf, len) == len);
+
+        /// Message 1 from server
+        char rcvBuf[1024];
+        SSASSERT(client->Receive(rcvBuf, sizeof(rcvBuf)) == 2 * len);
+        SSASSERT(String(rcvBuf, 2 * len) == "hello, world!hello, world!");
+
+        /// Message 2 from server
+        int64_t time1 = steadyTimeMillis();
+        // blocking until server send another reply which will happen about 500ms later
+        SSASSERT(client->Available() == 0); // but now there should be no data to read at this moment
+        SSASSERT(client->Receive(rcvBuf, sizeof(rcvBuf)) == 2 * len);
+        SSASSERT(String(rcvBuf, 2 * len) == "hello, world!hello, world!");
+        int64_t time2 = steadyTimeMillis();
+        SSASSERT(time2 - time1 > 400);
+
+        /// Message 3 from server
+        // Non blocking
+        SSASSERT(client->SetNonBlocking(true) == 0);
+        for (int i = 0; i < 4; ++i)
+        {
+            if (i == 3)
+            {
+                signal(); // notify server to send up another message
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+                // Here the server should have send another reply
+                SSASSERT(client->Available() == 2 * len);
+                SSASSERT(client->Receive(rcvBuf, sizeof(rcvBuf)) == 2 * len);
+                SSASSERT(String(rcvBuf, 2 * len) == "hello, world!hello, world!");
+            }
+
+            SSASSERT(client->Available() == 0);
+            SSASSERT(client->Receive(rcvBuf, sizeof(rcvBuf)) == -1);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        /// Message 4 from server
+        auto tcpInputStream = client->GetInputStream();
+        SSASSERT(tcpInputStream != nullptr);
+        for (int i = 0; i < 4; ++i)
+        {
+            if (i == 3)
+            {
+                signal(); // notify server to send up another message
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+                // Here the server should have send another reply
+                SSASSERT(tcpInputStream->Available() == 2 * len);
+                SSASSERT(tcpInputStream->Read(rcvBuf, sizeof(rcvBuf)) == 2 * len);
+                SSASSERT(String(rcvBuf, 2 * len) == "hello, world!hello, world!");
+                break;
+            }
+            auto va = tcpInputStream->Available();
+            SSASSERT(va == 0);
+            SSASSERT(tcpInputStream->Read(rcvBuf, sizeof(rcvBuf)) == 0);
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        client->Close();
+    });
+
+    auto server = TcpSocket::CreateSocket();
+    SSASSERT(server != nullptr);
+    SSASSERT(server->Bind("0.0.0.0", 1234) == 0);
+    SSASSERT(server->Listen(100) == 0);
+
+    auto client = server->Accept();
+    SSASSERT(client != nullptr);
+    char buf[1024];
+    auto len = uint32_t(strlen("hello, world!"));
+    SSASSERT(client->Receive(buf, sizeof(buf)) == len);
+
+    String msg(buf, len);
+    msg += msg;
+    std::string response = msg.ToStdString();
+
+    /// Message 1 from server
+    SSASSERT(client->Send(response.c_str(), response.length()) == 2 * len);
+
+    /// Message 2 from server
+    // Sleep for 500 milliseconds and send another reply
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    SSASSERT(client->Send(response.c_str(), response.length()) == 2 * len);
+
+    /// Message 3 from server
+    // Sleep for 500 milliseconds and send another reply
+    wait();
+    SSASSERT(client->Send(response.c_str(), response.length()) == 2 * len);
+
+    /// Message 4 from server
+    // Sleep for 500 milliseconds and send another reply
+    wait();
+    SSASSERT(client->Send(response.c_str(), response.length()) == 2 * len);
+
+    client = nullptr; // closed
+
+    server = nullptr;
+
+    clientThread.join();
+}
+
 bool test()
 {
     test_EndPoint();
 
     test_AsyncTcpSocket();
+
+    test_TcpSocket();
 
     return true;
 }
