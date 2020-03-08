@@ -13,16 +13,19 @@
 #ifdef SS_PLATFORM_WIN32
 #include <Windows.h>
 
-namespace ss {
+namespace ss
+{
 // To make windows console print utf8 strings properly
-class WindowsUtf8ConsoleHelper {
+class WindowsUtf8ConsoleHelper
+{
 public:
-    WindowsUtf8ConsoleHelper() {
+    WindowsUtf8ConsoleHelper()
+    {
         SetConsoleOutputCP(CP_UTF8);
     }
 };
 static WindowsUtf8ConsoleHelper __windowsUtf8ConsoleHelper;
-}
+} // namespace ss
 #endif
 
 namespace ss
@@ -502,7 +505,7 @@ String CharSequence::ReplaceAll(const CharSequence &oldStr, const CharSequence &
     String result(split[0]);
     if (split.size() > 1)
     {
-        uint32_t length = (split.size() - 1) * newStr.Length();
+        uint32_t length = uint32_t((split.size() - 1) * newStr.Length());
         for (auto &sv : split)
         {
             length += sv.Length();
@@ -678,13 +681,13 @@ String::String(wchar_t c) : CharSequence(), capacity_(0)
     *this += c;
 }
 
-inline uint32_t GetUtf8Length(const char *utf8)
+inline uint32_t GetUtf8Length(const char *utf8, uint32_t bytesCount)
 {
     uint32_t count = 0;
     uint32_t index = 0;
 
     auto fn = [&index, utf8]() -> utf8::char_type { return (utf8::char_type)utf8[index]; };
-    while (utf8[index] != 0)
+    while (utf8[index] != 0 && index < bytesCount)
     {
         auto size = utf8::char_size(fn);
         if (size == -1)
@@ -692,7 +695,7 @@ inline uint32_t GetUtf8Length(const char *utf8)
             return count;
         }
         ++count;
-        index += size;
+        index += uint32_t(size);
     }
     return count;
 }
@@ -702,9 +705,9 @@ inline uint32_t CalculateCapacity(uint32_t len)
     return Misc::CeilToPowerOfTwo(len);
 }
 
-String::String(const char *utf8) : CharSequence(), capacity_(0)
+String::String(const char *utf8, uint32_t bytesCount) : CharSequence(), capacity_(0)
 {
-    length_ = GetUtf8Length(utf8);
+    length_ = GetUtf8Length(utf8, bytesCount);
 
     ReAllocate(CalculateCapacity(length_));
 
@@ -717,9 +720,13 @@ String::String(const char *utf8) : CharSequence(), capacity_(0)
     }
 }
 
-String::String(const wchar_t *unicode) : CharSequence(), capacity_(0)
+String::String(const wchar_t *unicode, uint32_t charCount) : CharSequence(), capacity_(0)
 {
-    length_ = wcslen(unicode);
+    length_ = uint32_t(wcslen(unicode));
+    if (length_ > charCount)
+    {
+        length_ = charCount;
+    }
     ReAllocate(CalculateCapacity(length_));
 
     for (uint32_t i = 0; i < length_; ++i)
@@ -833,18 +840,19 @@ String &String::operator+=(const CharSequence &s)
         return *this;
     }
     auto oldLen = length_;
-    length_ = s.Length() + Length();
+    auto sLen = s.Length(); // Use a temp var, in case `s` and this is same object
+    length_ = oldLen + sLen;
     if (Capacity() < length_)
     {
         ReAllocate(CalculateCapacity(length_));
     }
-    memcpy(sequenceData_->chars_ + oldLen, s.Data(), s.Length() * sizeof(CharType));
+    memcpy(sequenceData_->chars_ + oldLen, s.Data(), sLen * sizeof(CharType));
     return *this;
 }
 
 String &String::operator=(const char *utf8)
 {
-    length_ = GetUtf8Length(utf8);
+    length_ = GetUtf8Length(utf8, kNPos);
     if (Capacity() < length_)
     {
         ReAllocate(CalculateCapacity(length_));
@@ -861,7 +869,7 @@ String &String::operator=(const char *utf8)
 
 String &String::operator+=(const char *utf8)
 {
-    auto utf8Len = GetUtf8Length(utf8);
+    auto utf8Len = GetUtf8Length(utf8, kNPos);
     if (utf8Len == 0)
     {
         return *this;

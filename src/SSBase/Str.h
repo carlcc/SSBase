@@ -213,8 +213,8 @@ public:
     explicit String();
     String(char c);
     String(wchar_t c);
-    String(const char *utf8);       // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
-    String(const wchar_t *unicode); // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    String(const char *utf8, uint32_t bytesCount = kNPos);       // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    String(const wchar_t *unicode, uint32_t charCount = kNPos); // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
     String(const CharType *chars, uint32_t length);
     String(const CharSequence &s); // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
     String(const String &s);
