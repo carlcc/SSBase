@@ -2,7 +2,7 @@
 // Copyright (c) 2020 Carl Chen. All rights reserved.
 //
 
-#include "TcpSocketImpl.h"
+#include "AsyncTcpSocketImpl.h"
 #include "../SSBase/ObjectPool.h"
 #include "EndPoint.h"
 #include "EndPointInternal.h"
@@ -11,16 +11,16 @@
 namespace ss
 {
 
-struct TcpSocketImpl::Data
+struct AsyncTcpSocketImpl::Data
 {
     uv_tcp_t handle_{};
     OnDataCb onDataCb_{nullptr};
     OnCloseCb onCloseCb_{nullptr};
     OnConnectionCb onConnectionCb{nullptr};
-    TcpSocketImpl *self_;
+    AsyncTcpSocketImpl *self_;
 };
 
-TcpSocketImpl::TcpSocketImpl(uv_loop_t *loop) : data_(nullptr), loop_(nullptr)
+AsyncTcpSocketImpl::AsyncTcpSocketImpl(uv_loop_t *loop) : data_(nullptr), loop_(nullptr)
 {
     if (loop == nullptr)
     {
@@ -41,12 +41,12 @@ TcpSocketImpl::TcpSocketImpl(uv_loop_t *loop) : data_(nullptr), loop_(nullptr)
     }
 }
 
-TcpSocketImpl::~TcpSocketImpl()
+AsyncTcpSocketImpl::~AsyncTcpSocketImpl()
 {
-    TcpSocketImpl::Close(nullptr);
+    AsyncTcpSocketImpl::Close(nullptr);
 }
 
-int TcpSocketImpl::Connect(const EndPoint &ep, OnConnectCb &&cb)
+int AsyncTcpSocketImpl::Connect(const EndPoint &ep, OnConnectCb &&cb)
 {
     if (data_ == nullptr)
     {
@@ -70,12 +70,12 @@ int TcpSocketImpl::Connect(const EndPoint &ep, OnConnectCb &&cb)
     });
 }
 
-int TcpSocketImpl::Connect(const String &host, uint16_t port, OnConnectCb &&cb)
+int AsyncTcpSocketImpl::Connect(const String &host, uint16_t port, OnConnectCb &&cb)
 {
     return Connect(EndPoint(host, port), std::forward<OnConnectCb>(cb));
 }
 
-int TcpSocketImpl::Bind(const EndPoint &ep)
+int AsyncTcpSocketImpl::Bind(const EndPoint &ep)
 {
     if (data_ == nullptr || !ep.IsValid())
     {
@@ -85,7 +85,7 @@ int TcpSocketImpl::Bind(const EndPoint &ep)
     return uv_tcp_bind((uv_tcp_t *)data_, &ep.impl_->addr_, 0);
 }
 
-int TcpSocketImpl::Listen(int backlog, TcpSocket::OnConnectionCb &&cb)
+int AsyncTcpSocketImpl::Listen(int backlog, OnConnectionCb &&cb)
 {
     if (data_ == nullptr)
     {
@@ -101,9 +101,9 @@ int TcpSocketImpl::Listen(int backlog, TcpSocket::OnConnectionCb &&cb)
     });
 }
 
-SharedPtr<TcpSocket> TcpSocketImpl::Accept()
+SharedPtr<AsyncTcpSocket> AsyncTcpSocketImpl::Accept()
 {
-    auto client = MakeShared<TcpSocketImpl>(loop_);
+    auto client = MakeShared<AsyncTcpSocketImpl>(loop_);
     SSASSERT(client->data_ != nullptr);
 
     if (0 != uv_accept((uv_stream_t *)data_, (uv_stream_t *)&client->data_->handle_))
@@ -113,7 +113,7 @@ SharedPtr<TcpSocket> TcpSocketImpl::Accept()
     return client;
 }
 
-int TcpSocketImpl::Send(const void *data, uint32_t length, OnSendCb &&cb)
+int AsyncTcpSocketImpl::Send(const void *data, uint32_t length, OnSendCb &&cb)
 {
     if (data_ == nullptr)
     {
@@ -147,7 +147,7 @@ static void UvAllocCb(uv_handle_t *handle, size_t suggested_size, uv_buf_t *buf)
     buf->len = 4096;
 }
 
-int TcpSocketImpl::StartReceive(OnDataCb &&cb)
+int AsyncTcpSocketImpl::StartReceive(OnDataCb &&cb)
 {
     if (data_ == nullptr)
     {
@@ -163,7 +163,7 @@ int TcpSocketImpl::StartReceive(OnDataCb &&cb)
     });
 }
 
-void TcpSocketImpl::StopReceive()
+void AsyncTcpSocketImpl::StopReceive()
 {
     if (data_ == nullptr)
     {
@@ -172,7 +172,7 @@ void TcpSocketImpl::StopReceive()
     uv_read_stop((uv_stream_s *)data_);
 }
 
-void TcpSocketImpl::Close(OnCloseCb &&cb)
+void AsyncTcpSocketImpl::Close(OnCloseCb &&cb)
 {
     if (data_ == nullptr)
     {
@@ -191,7 +191,7 @@ void TcpSocketImpl::Close(OnCloseCb &&cb)
     data_ = nullptr;
 }
 
-int TcpSocketImpl::ShutDown(TcpSocket::OnShutDownCb &&cb)
+int AsyncTcpSocketImpl::ShutDown(AsyncTcpSocket::OnShutDownCb &&cb)
 {
     if (data_ == nullptr)
     {

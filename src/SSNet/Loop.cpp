@@ -3,8 +3,8 @@
 //
 
 #include "Loop.h"
-#include "TcpSocket.h"
-#include "TcpSocketImpl.h"
+#include "AsyncTcpSocket.h"
+#include "AsyncTcpSocketImpl.h"
 #include <uv.h>
 
 namespace ss
@@ -55,9 +55,9 @@ void Loop::Stop()
     impl_->Stop();
 }
 
-SharedPtr<TcpSocket> Loop::CreateTcpSocket()
+SharedPtr<AsyncTcpSocket> Loop::CreateTcpSocket()
 {
-    return MakeShared<TcpSocketImpl>(&impl_->loop_);
+    return MakeShared<AsyncTcpSocketImpl>(&impl_->loop_);
 }
 
 } // namespace ss

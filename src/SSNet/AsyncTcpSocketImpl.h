@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "TcpSocket.h"
+#include "AsyncTcpSocket.h"
 #include <uv.h>
 
 namespace ss
@@ -12,18 +12,18 @@ namespace ss
 
 class Loop;
 
-class TcpSocketImpl : public TcpSocket
+class AsyncTcpSocketImpl : public AsyncTcpSocket
 {
-    SS_OBJECT(TcpSocketImpl, TcpSocket);
+    SS_OBJECT(AsyncTcpSocketImpl, AsyncTcpSocket);
 
 public:
-    explicit TcpSocketImpl(uv_loop_t *loop);
-    TcpSocketImpl(const TcpSocketImpl &) = delete;
-    TcpSocketImpl(TcpSocketImpl &&) = delete;
-    ~TcpSocketImpl() override;
+    explicit AsyncTcpSocketImpl(uv_loop_t *loop);
+    AsyncTcpSocketImpl(const AsyncTcpSocketImpl &) = delete;
+    AsyncTcpSocketImpl(AsyncTcpSocketImpl &&) = delete;
+    ~AsyncTcpSocketImpl() override;
 
-    TcpSocketImpl &operator=(const TcpSocketImpl &) = delete;
-    TcpSocketImpl &operator=(TcpSocketImpl &&) = delete;
+    AsyncTcpSocketImpl &operator=(const AsyncTcpSocketImpl &) = delete;
+    AsyncTcpSocketImpl &operator=(AsyncTcpSocketImpl &&) = delete;
 
     int Connect(const EndPoint &ep, OnConnectCb &&cb) override;
     int Connect(const String &host, uint16_t port, OnConnectCb &&cb) override;
@@ -32,7 +32,7 @@ public:
 
     int Listen(int backlog, OnConnectionCb &&cb) override;
 
-    SharedPtr<TcpSocket> Accept() override;
+    SharedPtr<AsyncTcpSocket> Accept() override;
 
     int Send(const void *data, uint32_t length, OnSendCb &&cb) override;
 

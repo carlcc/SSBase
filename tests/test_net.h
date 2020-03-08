@@ -2,7 +2,7 @@
 
 #include <SSNet/EndPoint.h>
 #include <SSNet/Loop.h>
-#include <SSNet/TcpSocket.h>
+#include <SSNet/AsyncTcpSocket.h>
 #include <thread>
 #include <uv.h>
 
@@ -189,7 +189,7 @@ void test_EndPoint()
     }
 }
 
-void test_TcpSocket_client()
+void test_AsyncTcpSocket_client()
 {
     Loop loop;
     auto client = loop.CreateTcpSocket();
@@ -226,11 +226,11 @@ void test_TcpSocket_client()
     std::cout << "Client exit" << std::endl;
 }
 
-void test_TcpSocket()
+void test_AsyncTcpSocket()
 {
     std::thread clientThread([]() {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        test_TcpSocket_client();
+        test_AsyncTcpSocket_client();
     });
 
     // Server thread
@@ -241,7 +241,7 @@ void test_TcpSocket()
     SSASSERT(0 == serverSocket->Bind("0.0.0.0:1234"));
     // Use this variable, if we put this lambda directly as function arguments,
     // VS would do optimize which cause this callback be wiped out, why? Strange...
-    auto cb = [](TcpSocket *server, int status) {
+    auto cb = [](AsyncTcpSocket *server, int status) {
         SSASSERT(status == 0);
         auto client = server->Accept();
         SSASSERT(client != nullptr);
@@ -288,7 +288,7 @@ bool test()
 {
     test_EndPoint();
 
-    test_TcpSocket();
+    test_AsyncTcpSocket();
 
     return true;
 }

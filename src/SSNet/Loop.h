@@ -10,7 +10,7 @@
 namespace ss
 {
 
-class TcpSocket;
+class AsyncTcpSocket;
 
 class Loop : public Object
 {
@@ -30,7 +30,7 @@ public:
     void Stop();
 
     ////
-    SharedPtr<TcpSocket> CreateTcpSocket();
+    SharedPtr<AsyncTcpSocket> CreateTcpSocket();
 
 private:
     class LoopImpl;
