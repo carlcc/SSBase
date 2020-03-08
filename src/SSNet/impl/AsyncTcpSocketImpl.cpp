@@ -3,42 +3,15 @@
 //
 
 #include "AsyncTcpSocketImpl.h"
-#include "../SSBase/ObjectPool.h"
-#include "EndPoint.h"
-#include "EndPointInternal.h"
-#include "Loop.h"
+#include "../EndPoint.h"
+#include "../EndPointInternal.h"
+#include "../Loop.h"
 
 namespace ss
 {
 
-struct AsyncTcpSocketImpl::Data
+AsyncTcpSocketImpl::AsyncTcpSocketImpl(Data *data) : data_(data)
 {
-    uv_tcp_t handle_{};
-    OnDataCb onDataCb_{nullptr};
-    OnCloseCb onCloseCb_{nullptr};
-    OnConnectionCb onConnectionCb{nullptr};
-    AsyncTcpSocketImpl *self_;
-};
-
-AsyncTcpSocketImpl::AsyncTcpSocketImpl(uv_loop_t *loop) : data_(nullptr), loop_(nullptr)
-{
-    if (loop == nullptr)
-    {
-        return;
-    }
-
-    data_ = new Data;
-    if (0 != uv_tcp_init(loop, (uv_tcp_t *)data_))
-    {
-        delete data_;
-        data_ = nullptr;
-    }
-    else
-    {
-        data_->handle_.data = data_;
-        data_->self_ = this;
-        loop_ = loop;
-    }
 }
 
 AsyncTcpSocketImpl::~AsyncTcpSocketImpl()
@@ -70,11 +43,6 @@ int AsyncTcpSocketImpl::Connect(const EndPoint &ep, OnConnectCb &&cb)
     });
 }
 
-int AsyncTcpSocketImpl::Connect(const String &host, uint16_t port, OnConnectCb &&cb)
-{
-    return Connect(EndPoint(host, port), std::forward<OnConnectCb>(cb));
-}
-
 int AsyncTcpSocketImpl::Bind(const EndPoint &ep)
 {
     if (data_ == nullptr || !ep.IsValid())
@@ -103,14 +71,22 @@ int AsyncTcpSocketImpl::Listen(int backlog, OnConnectionCb &&cb)
 
 SharedPtr<AsyncTcpSocket> AsyncTcpSocketImpl::Accept()
 {
-    auto client = MakeShared<AsyncTcpSocketImpl>(loop_);
-    SSASSERT(client->data_ != nullptr);
+    auto *data = new AsyncTcpSocketImpl::Data;
 
-    if (0 != uv_accept((uv_stream_t *)data_, (uv_stream_t *)&client->data_->handle_))
+    if (0 != uv_tcp_init(data_->handle_.loop, (uv_tcp_t *)data))
     {
+        delete data;
         return nullptr;
     }
-    return client;
+    if (0 != uv_accept((uv_stream_t *)data_, (uv_stream_t *)data))
+    {
+        uv_close((uv_handle_t *)data, [](uv_handle_t *h) { delete (AsyncTcpSocketImpl::Data *)h; });
+        return nullptr;
+    }
+    auto s = MakeShared<AsyncTcpSocketImpl>(data);
+    data->handle_.data = data;
+    data->self_ = s.Get();
+    return s;
 }
 
 int AsyncTcpSocketImpl::Send(const void *data, uint32_t length, OnSendCb &&cb)

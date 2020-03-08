@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "AsyncTcpSocket.h"
+#include "../../SSNet/AsyncTcpSocket.h"
 #include <uv.h>
 
 namespace ss
@@ -17,7 +17,10 @@ class AsyncTcpSocketImpl : public AsyncTcpSocket
     SS_OBJECT(AsyncTcpSocketImpl, AsyncTcpSocket);
 
 public:
-    explicit AsyncTcpSocketImpl(uv_loop_t *loop);
+    struct Data;
+
+    // This object will take the ownship of handle
+    explicit AsyncTcpSocketImpl(Data *handle);
     AsyncTcpSocketImpl(const AsyncTcpSocketImpl &) = delete;
     AsyncTcpSocketImpl(AsyncTcpSocketImpl &&) = delete;
     ~AsyncTcpSocketImpl() override;
@@ -26,7 +29,6 @@ public:
     AsyncTcpSocketImpl &operator=(AsyncTcpSocketImpl &&) = delete;
 
     int Connect(const EndPoint &ep, OnConnectCb &&cb) override;
-    int Connect(const String &host, uint16_t port, OnConnectCb &&cb) override;
 
     int Bind(const EndPoint &ep) override;
 
@@ -45,9 +47,16 @@ public:
     int ShutDown(OnShutDownCb &&cb) override;
 
 private:
-    struct Data;
     Data *data_;
-    uv_loop_t *loop_;
+};
+
+struct AsyncTcpSocketImpl::Data
+{
+    uv_tcp_t handle_{};
+    OnDataCb onDataCb_{nullptr};
+    OnCloseCb onCloseCb_{nullptr};
+    OnConnectionCb onConnectionCb{nullptr};
+    AsyncTcpSocketImpl *self_;
 };
 
 } // namespace ss

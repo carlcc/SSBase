@@ -33,7 +33,7 @@ public:
 
     virtual int Connect(const EndPoint &ep, OnConnectCb &&cb) = 0;
 
-    virtual int Connect(const String &host, uint16_t port, OnConnectCb &&cb) = 0;
+    int Connect(const String &host, uint16_t port, OnConnectCb &&cb);
 
     virtual int Bind(const EndPoint &ep) = 0;
 

@@ -44,6 +44,7 @@ private:
     std::unique_ptr<Impl> impl_;
 
     friend class AsyncTcpSocketImpl;
+    friend class TcpSocketImpl;
 };
 
 } // namespace ss

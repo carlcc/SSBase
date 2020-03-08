@@ -4,7 +4,7 @@
 
 #include "Loop.h"
 #include "AsyncTcpSocket.h"
-#include "AsyncTcpSocketImpl.h"
+#include "impl/AsyncTcpSocketImpl.h"
 #include <uv.h>
 
 namespace ss
@@ -57,7 +57,17 @@ void Loop::Stop()
 
 SharedPtr<AsyncTcpSocket> Loop::CreateTcpSocket()
 {
-    return MakeShared<AsyncTcpSocketImpl>(&impl_->loop_);
+    auto *data = new AsyncTcpSocketImpl::Data;
+
+    if (0 != uv_tcp_init(&impl_->loop_, (uv_tcp_t *)data))
+    {
+        delete data;
+        return nullptr;
+    }
+    auto s = MakeShared<AsyncTcpSocketImpl>(data);
+    data->handle_.data = data;
+    data->self_ = s.Get();
+    return s;
 }
 
 } // namespace ss

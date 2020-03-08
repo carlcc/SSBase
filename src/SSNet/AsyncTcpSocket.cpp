@@ -8,6 +8,11 @@
 namespace ss
 {
 
+int AsyncTcpSocket::Connect(const String &host, uint16_t port, OnConnectCb &&cb)
+{
+    return Connect(EndPoint(host, port), std::forward<OnConnectCb>(cb));
+}
+
 int AsyncTcpSocket::Bind(const String &hostAndIp)
 {
     return Bind(EndPoint(hostAndIp));
