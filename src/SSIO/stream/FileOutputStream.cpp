@@ -37,7 +37,7 @@ int32_t FileOutputStream::Write(const void *data, uint32_t count)
     {
         return StreamConstant::ErrorCode::kUnknown;
     }
-    return c;
+    return int32_t(c);
 }
 
 void FileOutputStream::Close()

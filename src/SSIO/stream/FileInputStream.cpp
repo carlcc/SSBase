@@ -37,7 +37,7 @@ int32_t FileInputStream::Read(void *buf, uint32_t count)
         if (feof(filePtr_))
         {
             // EOF
-            return c > 0 ? c : StreamConstant::ErrorCode::kEof;
+            return int32_t(c > 0 ? c : StreamConstant::ErrorCode::kEof);
         }
         if (ferror(filePtr_))
         {
@@ -87,7 +87,7 @@ std::string FileInputStream::ReadAll()
 {
     std::string result;
     result.resize(Available());
-    Read(const_cast<char *>(result.data()), result.size());
+    Read(const_cast<char *>(result.data()), (uint32_t)result.size());
     return result;
 }
 

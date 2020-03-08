@@ -31,11 +31,11 @@ public:
     {
         uint8_t c;
         auto count = Read(&c, 1);
-        if (c == 1)
+        if (count == 1)
         {
             return c;
         }
-        return count;
+        return -1;
     }
 
     int32_t Read(void *buf, uint32_t count) override
