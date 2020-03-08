@@ -62,7 +62,7 @@ public:
         if (ret < 0)
         {
             auto code = TcpSocket::GetLastErrorCode();
-            if (code == SS_EAGAIN || code == SS_EAGAIN)
+            if (code == SS_EAGAIN || code == SS_EWOULDBLOCK)
             {
                 return 0;
             }
