@@ -12,7 +12,13 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #else
-#error not yet implemented
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <unistd.h>
 #endif
 
 namespace ss
@@ -96,7 +102,11 @@ public:
     {
         if (INVALID_SOCKET != sockFd_)
         {
+#ifdef SS_PLATFORM_WIN32
             closesocket(sockFd_);
+#else
+            close(sockFd_);
+#endif
             sockFd_ = INVALID_SOCKET;
         }
     }
@@ -108,8 +118,14 @@ public:
 
     int Available() const override
     {
-        u_long avalable = 0;
+
+#ifdef SS_PLATFORM_WIN32
+        int avalable = 0;
         if (0 == ioctlsocket(sockFd_, FIONREAD, &avalable))
+#else
+        u_long avalable = 0;
+        if (0 == ioctl(sockFd_, FIONREAD, (char *)&avalable))
+#endif
         {
             return (int)avalable;
         }
@@ -119,18 +135,38 @@ public:
     int SetNonBlocking(bool b) override
     {
         u_long mode = b ? 1 : 0;
+#ifdef SS_PLATFORM_WIN32
         return ioctlsocket(sockFd_, FIONBIO, &mode);
+#else
+        return ioctl(sockFd_, FIONBIO, (char *)&mode);
+#endif
     }
 
     int SetSendTimeout(int millis) override
     {
+#ifdef SS_PLATFORM_WIN32
         DWORD timeout = millis < 0 ? 0 : millis;
+#else
+        if (millis < 0)
+        {
+            millis = 0;
+        }
+        struct timeval timeout = {millis / 1000, millis % 1000};
+#endif
         return setsockopt(sockFd_, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout));
     }
 
     int SetReceiveTimeout(int millis) override
     {
+#ifdef SS_PLATFORM_WIN32
         DWORD timeout = millis < 0 ? 0 : millis;
+#else
+        if (millis < 0)
+        {
+            millis = 0;
+        }
+        struct timeval timeout = {millis / 1000, millis % 1000};
+#endif
         return setsockopt(sockFd_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout));
     }
 

@@ -312,9 +312,9 @@ void test_TcpSocket()
 
     std::thread clientThread([&]() {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        auto client = TcpSocket::CreateSocket();
+        auto client = TcpSocket::CreateSocket(IpProtocolType::SS_IPV4);
         SSASSERT(client != nullptr);
-        SSASSERT(client->Connect("127.0.0.1", 1234) == 0);
+        SSASSERT(client->Connect("127.0.0.1", 1235) == 0);
         char buf[1024] = "hello, world!";
         auto len = (uint32_t)strlen(buf);
         SSASSERT(client->Send(buf, len) == len);
@@ -379,9 +379,9 @@ void test_TcpSocket()
         client->Close();
     });
 
-    auto server = TcpSocket::CreateSocket();
+    auto server = TcpSocket::CreateSocket(IpProtocolType::SS_IPV6);
     SSASSERT(server != nullptr);
-    SSASSERT(server->Bind("0.0.0.0", 1234) == 0);
+    SSASSERT(server->Bind("::0", 1235) == 0);
     SSASSERT(server->Listen(100) == 0);
 
     auto client = server->Accept();

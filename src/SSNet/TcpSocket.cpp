@@ -6,6 +6,7 @@
 #include "../SSIO/stream/InputStream.h"
 #include "../SSIO/stream/OutputStream.h"
 #include "EndPoint.h"
+#include "SocketDef.h"
 #include "impl/TcpSocketImpl.h"
 #include <SSIO/stream/StreamConstant.h>
 
@@ -27,18 +28,29 @@ int TcpSocket::Bind(const String &host, uint16_t port)
     return Bind(EndPoint(host, port));
 }
 
-SharedPtr<TcpSocket> TcpSocket::CreateSocket()
+SharedPtr<TcpSocket> TcpSocket::CreateSocket(IpProtocolType type)
 {
-#ifdef SS_PLATFORM_WIN32
     // Create Socket and check if error occured afterwards
-    SOCKET fd = socket(AF_UNSPEC, SOCK_STREAM, IPPROTO_TCP);
+    int domain = type == IpProtocolType::SS_IPV4 ? AF_INET : AF_INET6;
+
+    // NOTE: On windows, the domain may be AF_UNSPEC,
+    // then this socket can then bind to both IPv6 address and IPv4 Address
+    // But it seems linux does not support this feature.
+    SOCKET fd = socket(domain, SOCK_STREAM, IPPROTO_TCP);
     if (INVALID_SOCKET == fd)
     {
         return nullptr;
     }
-#else
+    if (type == IpProtocolType::SS_IPV6)
+    {
+        // Disable V6ONLY option for IPv6, ignore the return code
+#ifdef SS_PLATFORM_WIN32
 #error NYI
+#else
+        int v6only = 0;
+        setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &v6only, sizeof(v6only));
 #endif
+    }
     return MakeShared<TcpSocketImpl>(fd);
 }
 
@@ -155,7 +167,6 @@ private:
 
 SharedPtr<OutputStream> TcpSocket::GetOutputStream()
 {
-    new TcpSocketOutputStream(this);
     return MakeShared<TcpSocketOutputStream>(this);
 }
 
@@ -164,7 +175,7 @@ int TcpSocket::GetLastErrorCode()
 #ifdef SS_PLATFORM_WIN32
     return WSAGetLastError();
 #else
-#error NYI, return errno?
+    return errno;
 #endif
 }
 

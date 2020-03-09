@@ -303,7 +303,11 @@ bool FileSystem::MakeDirs(const CharSequence &path)
 
 bool FileSystem::Rename(const CharSequence &from, const CharSequence &to)
 {
+#ifdef SS_PLATFORM_WIN32
     return _wrename(from.ToStdWString().c_str(), to.ToStdWString().c_str()) == 0;
+#else
+    return rename(from.ToStdString().c_str(), to.ToStdString().c_str()) == 0;
+#endif
 }
 
 bool FileSystem::Delete(const CharSequence &path, bool recursive)

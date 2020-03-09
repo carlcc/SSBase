@@ -5,7 +5,7 @@
 #pragma once
 
 #include "../SSBase/Object.h"
-#include "SocketErrorCode.h"
+#include "SocketDef.h"
 #include <cstdint>
 
 namespace ss
@@ -22,7 +22,7 @@ class TcpSocket : public Object
     SS_OBJECT(TcpSocket, Object);
 
 public:
-    static SharedPtr<TcpSocket> CreateSocket();
+    static SharedPtr<TcpSocket> CreateSocket(IpProtocolType type);
 
     virtual int Connect(const EndPoint &ep) = 0;
 
