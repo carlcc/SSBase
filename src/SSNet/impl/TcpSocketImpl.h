@@ -170,6 +170,12 @@ public:
         return setsockopt(sockFd_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout));
     }
 
+    int SetNoDelay(bool b) override
+    {
+        int flag = b ? 1 : 0;
+        return setsockopt(sockFd_, IPPROTO_TCP, TCP_NODELAY, (const char *)&flag, sizeof(flag));
+    }
+
 private:
     SOCKET sockFd_;
 };

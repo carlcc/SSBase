@@ -65,6 +65,8 @@ public:
 
     /// The receive timeout if this socket uses blocking IO
     virtual int SetReceiveTimeout(int millis) = 0;
+
+    virtual int SetNoDelay(bool b) = 0;
 };
 
 } // namespace ss
