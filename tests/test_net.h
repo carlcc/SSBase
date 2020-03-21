@@ -9,8 +9,7 @@
 #include <thread>
 #include <uv.h>
 
-namespace TestNet
-{
+namespace TestNet {
 
 using namespace ss;
 
@@ -201,15 +200,11 @@ void test_AsyncTcpSocket_client()
     // VS would do optimize which cause this callback be wiped out, why? Strange...
     auto cb = [client](int status) {
         SSASSERT(status == 0);
-        client->StartReceive([client](ssize_t nread, const char *buf) {
-            if (nread < 0)
-            {
-                if (nread == UV_EOF)
-                {
+        client->StartReceive([client](ssize_t nread, const char* buf) {
+            if (nread < 0) {
+                if (nread == UV_EOF) {
                     std::cout << "Client Get: eof" << std::endl;
-                }
-                else
-                {
+                } else {
                     std::cout << "Client Get: error" << std::endl;
                 }
                 return;
@@ -244,35 +239,30 @@ void test_AsyncTcpSocket()
     SSASSERT(0 == serverSocket->Bind("0.0.0.0:1234"));
     // Use this variable, if we put this lambda directly as function arguments,
     // VS would do optimize which cause this callback be wiped out, why? Strange...
-    auto cb = [](AsyncTcpSocket *server, int status) {
+    auto cb = [](AsyncTcpSocket* server, int status) {
         SSASSERT(status == 0);
         auto client = server->Accept();
         SSASSERT(client != nullptr);
 
-        client->StartReceive([client, server](ssize_t nread, const char *buf) {
-            if (nread < 0)
-            {
+        client->StartReceive([client, server](ssize_t nread, const char* buf) {
+            if (nread < 0) {
 
-                if (nread == UV_EOF)
-                {
+                if (nread == UV_EOF) {
                     std::cout << "Server Get: eof" << std::endl;
-                }
-                else
-                {
+                } else {
                     std::cout << "Server Get: error" << std::endl;
                 }
                 return;
             }
             std::string msg = std::string(buf, nread);
 
-            if (msg == "bye")
-            {
+            if (msg == "bye") {
                 client->Close(nullptr);
                 server->Close(nullptr);
                 return;
             }
 
-            char *buffer = new char[1024];
+            char* buffer = new char[1024];
             memcpy(buffer, buf, nread);
             memcpy(buffer + nread, buf, nread);
             std::cout << "Server Get: " << msg << std::endl;
@@ -336,10 +326,8 @@ void test_TcpSocket()
         /// Message 3 from server
         // Non blocking
         SSASSERT(client->SetNonBlocking(true) == 0);
-        for (int i = 0; i < 4; ++i)
-        {
-            if (i == 3)
-            {
+        for (int i = 0; i < 4; ++i) {
+            if (i == 3) {
                 signal(); // notify server to send up another message
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
@@ -357,10 +345,8 @@ void test_TcpSocket()
         /// Message 4 from server
         auto tcpInputStream = client->GetInputStream();
         SSASSERT(tcpInputStream != nullptr);
-        for (int i = 0; i < 4; ++i)
-        {
-            if (i == 3)
-            {
+        for (int i = 0; i < 4; ++i) {
+            if (i == 3) {
                 signal(); // notify server to send up another message
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
 

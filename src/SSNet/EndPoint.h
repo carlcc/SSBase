@@ -8,22 +8,20 @@
 #include <cstdint>
 #include <memory>
 
-namespace ss
-{
+namespace ss {
 
-class EndPoint
-{
+class EndPoint {
 public:
     EndPoint();
-    EndPoint(const CharSequence &IP, uint16_t port);
-    EndPoint(const String &IP, uint16_t port);
-    EndPoint(const String &IPAndPort);       // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
-    EndPoint(const CharSequence &IPAndPort); // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
-    EndPoint(const EndPoint &ep);
-    EndPoint(EndPoint &&ep) noexcept;
+    EndPoint(const CharSequence& IP, uint16_t port);
+    EndPoint(const String& IP, uint16_t port);
+    EndPoint(const String& IPAndPort); // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    EndPoint(const CharSequence& IPAndPort); // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    EndPoint(const EndPoint& ep);
+    EndPoint(EndPoint&& ep) noexcept;
     ~EndPoint();
-    EndPoint &operator=(const EndPoint &ep);
-    EndPoint &operator=(EndPoint &&ep) noexcept;
+    EndPoint& operator=(const EndPoint& ep);
+    EndPoint& operator=(EndPoint&& ep) noexcept;
 
     bool IsValid() const;
 
@@ -36,8 +34,8 @@ public:
     uint16_t Port() const;
 
 private:
-    void InitWithIpAndPort(const CharSequence &IP, uint16_t port);
-    void InitWithString(const CharSequence &IPAndPort);
+    void InitWithIpAndPort(const CharSequence& IP, uint16_t port);
+    void InitWithString(const CharSequence& IPAndPort);
 
 private:
     struct Impl;

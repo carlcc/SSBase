@@ -6,24 +6,23 @@
 
 #include "Str.h"
 
-namespace ss
-{
+namespace ss {
 
-template <class Container> StrSplitter::operator Container() const
+template <class Container>
+StrSplitter::operator Container() const
 {
     Container container;
     Split(container);
     return container;
 }
 
-template <class Container> void StrSplitter::Split(Container &container) const
+template <class Container>
+void StrSplitter::Split(Container& container) const
 {
     uint32_t indexStart = 0;
-    while (true)
-    {
+    while (true) {
         uint32_t indexEnd = str_.Find(splitter_, indexStart);
-        if (indexEnd == CharSequence::kNPos)
-        {
+        if (indexEnd == CharSequence::kNPos) {
             container.insert(container.end(), str_.SubStringView(indexStart));
             break;
         }

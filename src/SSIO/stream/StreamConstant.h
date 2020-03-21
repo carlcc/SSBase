@@ -4,11 +4,9 @@
 
 #pragma once
 
-class StreamConstant
-{
+class StreamConstant {
 public:
-    enum ErrorCode
-    {
+    enum ErrorCode {
         kOk = 0,
         kEof = -1,
         kUnknown = -128

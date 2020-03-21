@@ -5,15 +5,16 @@
 #include "FileOutputStream.h"
 #include "StreamConstant.h"
 
-namespace ss
-{
+namespace ss {
 
-FileOutputStream::FileOutputStream(const CharSequence &file) : filePtr_(nullptr)
+FileOutputStream::FileOutputStream(const CharSequence& file)
+    : filePtr_(nullptr)
 {
     Init(file);
 }
 
-FileOutputStream::FileOutputStream(const String &file) : filePtr_(nullptr)
+FileOutputStream::FileOutputStream(const String& file)
+    : filePtr_(nullptr)
 {
     Init(file);
 }
@@ -29,12 +30,11 @@ int FileOutputStream::Write(uint8_t byte)
     return fputc(byte, filePtr_);
 }
 
-int32_t FileOutputStream::Write(const void *data, uint32_t count)
+int32_t FileOutputStream::Write(const void* data, uint32_t count)
 {
     SSASSERT(filePtr_ != nullptr);
     size_t c = fwrite(data, 1, count, filePtr_);
-    if (c < count)
-    {
+    if (c < count) {
         return StreamConstant::ErrorCode::kUnknown;
     }
     return int32_t(c);
@@ -42,8 +42,7 @@ int32_t FileOutputStream::Write(const void *data, uint32_t count)
 
 void FileOutputStream::Close()
 {
-    if (filePtr_ != nullptr)
-    {
+    if (filePtr_ != nullptr) {
         Flush();
         fclose(filePtr_);
         filePtr_ = nullptr;
@@ -57,14 +56,13 @@ bool FileOutputStream::IsValid() const
 
 int32_t FileOutputStream::Flush()
 {
-    if (fflush(filePtr_) == 0)
-    {
+    if (fflush(filePtr_) == 0) {
         return StreamConstant::ErrorCode::kOk;
     }
     return StreamConstant::ErrorCode::kUnknown;
 }
 
-void FileOutputStream::Init(const CharSequence &file)
+void FileOutputStream::Init(const CharSequence& file)
 {
 #ifdef SS_PLATFORM_UNIX
     filePtr_ = fopen(file.ToStdString().c_str(), "wb");

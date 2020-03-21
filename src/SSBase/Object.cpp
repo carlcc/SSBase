@@ -4,26 +4,25 @@
 
 #include "Object.h"
 
-namespace ss
-{
+namespace ss {
 
-const String &Object::GetTypeNameStatic()
+const String& Object::GetTypeNameStatic()
 {
     static String name("Object");
     return name;
 }
 
-const RuntimeTypeInfo *Object::GetTypeInfoStatic()
+const RuntimeTypeInfo* Object::GetTypeInfoStatic()
 {
-    static ss::RuntimeTypeInfo runtimeTypeInfo{"Object", nullptr, Object::GetAllPropertiesStatic};
+    static ss::RuntimeTypeInfo runtimeTypeInfo { "Object", nullptr, Object::GetAllPropertiesStatic };
     return &runtimeTypeInfo;
 }
 
-const PropertyMap &Object::GetAllPropertiesStatic()
+const PropertyMap& Object::GetAllPropertiesStatic()
 {
-    static struct PropertyMapLoader
-    {
-        PropertyMapLoader() : propertyMap_(Object::RegisterProperties())
+    static struct PropertyMapLoader {
+        PropertyMapLoader()
+            : propertyMap_(Object::RegisterProperties())
         {
         }
         std::map<String, Property> propertyMap_;
@@ -31,17 +30,17 @@ const PropertyMap &Object::GetAllPropertiesStatic()
     return sPropertyMap.propertyMap_;
 }
 
-const String &Object::GetTypeName()
+const String& Object::GetTypeName()
 {
     return Object::GetTypeNameStatic();
 }
 
-const ss::RuntimeTypeInfo *Object::GetTypeInfo()
+const ss::RuntimeTypeInfo* Object::GetTypeInfo()
 {
     return Object::GetTypeInfoStatic();
 }
 
-const PropertyMap &Object::GetAllProperties()
+const PropertyMap& Object::GetAllProperties()
 {
     return Object::GetAllPropertiesStatic();
 }
@@ -52,7 +51,7 @@ PropertyMap Object::RegisterProperties()
     return propertyMap;
 }
 
-void Object::SignalDisconnectAll(const String &signal)
+void Object::SignalDisconnectAll(const String& signal)
 {
     signals_[signal].disconnect_all();
 }
@@ -62,11 +61,10 @@ void Object::SignalDisconnectAll()
     signals_.clear();
 }
 
-void Object::SignalEmit(const String &signal, VariantMap &params)
+void Object::SignalEmit(const String& signal, VariantMap& params)
 {
     auto it = signals_.find(signal);
-    if (it == signals_.end())
-    {
+    if (it == signals_.end()) {
         return;
     }
     it->second.emit(params);

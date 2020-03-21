@@ -7,40 +7,35 @@
 #include <SSBase/Object.h>
 #include <SSBase/Ptr.h>
 
-namespace TestSignal
-{
+namespace TestSignal {
 
 std::stringstream gOutput;
 
-class Switcher : public ss::Object
-{
+class Switcher : public ss::Object {
     SS_OBJECT(Switcher, ss::Object);
 
 public:
 };
 
-class Light : public ss::Object
-{
+class Light : public ss::Object {
     SS_OBJECT(Light, ss::Object);
 
 public:
-    explicit Light(int n) : n_(n)
+    explicit Light(int n)
+        : n_(n)
     {
         static int counter = 1;
         id_ = counter++;
     }
 
 public:
-    void handleSwitch(ss::VariantMap &params)
+    void handleSwitch(ss::VariantMap& params)
     {
         count_++;
-        if (count_ == n_)
-        {
+        if (count_ == n_) {
             isOn_ = true;
             count_ = 0;
-        }
-        else
-        {
+        } else {
             isOn_ = false;
         }
         gOutput << "Toggle light " << id_ << " to " << (isOn_ ? "on" : "off") << std::endl;
@@ -48,23 +43,22 @@ public:
 
     int n_;
     int id_;
-    int count_{0};
-    bool isOn_{true};
+    int count_ { 0 };
+    bool isOn_ { true };
 };
 
-class Fan : public ss::Object
-{
+class Fan : public ss::Object {
     SS_OBJECT(Light, ss::Object);
 
 public:
-    void handleSwitch(ss::VariantMap &params)
+    void handleSwitch(ss::VariantMap& params)
     {
         isOn_ = !isOn_;
         gOutput << "Toggle fan " << (isOn_ ? "on" : "off") << ", And greetings: " << params["msg"].GetString()
-                  << std::endl;
+                << std::endl;
     }
 
-    bool isOn_{false};
+    bool isOn_ { false };
 };
 
 bool test()
@@ -80,15 +74,12 @@ bool test()
 
         ss::VariantMap params;
         params["msg"] = "'Greeting msg!'";
-        for (int i = 0; i < 10; ++i)
-        {
+        for (int i = 0; i < 10; ++i) {
             gOutput << "======" << i << std::endl;
-            if (i == 5)
-            {
+            if (i == 5) {
                 switcher->SignalDisconnect("toggle", fan);
             }
-            if (i == 6)
-            {
+            if (i == 6) {
                 light2 = nullptr;
             }
             switcher->SignalEmit("toggle", params);

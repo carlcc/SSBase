@@ -8,13 +8,13 @@
 #include <functional>
 #include <memory>
 
-namespace ss
-{
+namespace ss {
 
-template <class T> class SharedPtr
-{
+template <class T>
+class SharedPtr {
 public:
-    SharedPtr() : refCounter_(nullptr)
+    SharedPtr()
+        : refCounter_(nullptr)
     {
     }
 
@@ -23,30 +23,32 @@ public:
     {
     }
 
-    SharedPtr(T *t) : refCounter_(nullptr) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    SharedPtr(T* t)
+        : refCounter_(nullptr) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
     {
-        if (t != nullptr)
-        {
-            refCounter_ = static_cast<RefCounted *>(t)->refCounter_;
+        if (t != nullptr) {
+            refCounter_ = static_cast<RefCounted*>(t)->refCounter_;
             SSASSERT(refCounter_ != nullptr);
             refCounter_->IncreaseShared();
         }
     }
 
     template <class P>
-    SharedPtr(const SharedPtr<P> &p) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    SharedPtr(const SharedPtr<P>& p) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
         : refCounter_(p.refCounter_)
     {
-        (void)static_cast<T *>(p.Get()); // to ensure type T and P are compatible
+        (void)static_cast<T*>(p.Get()); // to ensure type T and P are compatible
         IncreaseRefCount();
     }
 
-    SharedPtr(const SharedPtr &p) : refCounter_(p.refCounter_)
+    SharedPtr(const SharedPtr& p)
+        : refCounter_(p.refCounter_)
     {
         IncreaseRefCount();
     }
 
-    SharedPtr(SharedPtr &&p) noexcept : refCounter_(p.refCounter_)
+    SharedPtr(SharedPtr&& p) noexcept
+        : refCounter_(p.refCounter_)
     {
         p.refCounter_ = nullptr;
     }
@@ -56,13 +58,12 @@ public:
         DecreaseRefCount();
     }
 
-    T *Get() const
+    T* Get() const
     {
-        if (refCounter_ == nullptr)
-        {
+        if (refCounter_ == nullptr) {
             return nullptr;
         }
-        return static_cast<T *>(refCounter_->object);
+        return static_cast<T*>(refCounter_->object);
     }
 
     explicit operator bool() const
@@ -75,25 +76,24 @@ public:
         return Get() == nullptr;
     }
 
-    operator T *() const // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    operator T*() const // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
     {
         return Get();
     }
 
-    T *operator->() const
+    T* operator->() const
     {
         return Get();
     }
 
-    T &operator*() const
+    T& operator*() const
     {
         return *Get();
     }
 
-    SharedPtr &operator=(const SharedPtr &p) noexcept
+    SharedPtr& operator=(const SharedPtr& p) noexcept
     {
-        if (p.refCounter_ != refCounter_)
-        {
+        if (p.refCounter_ != refCounter_) {
             DecreaseRefCount();
             refCounter_ = p.refCounter_;
             IncreaseRefCount();
@@ -101,10 +101,9 @@ public:
         return *this;
     }
 
-    SharedPtr &operator=(SharedPtr &&p) noexcept
+    SharedPtr& operator=(SharedPtr&& p) noexcept
     {
-        if (p.refCounter_ != refCounter_)
-        {
+        if (p.refCounter_ != refCounter_) {
             DecreaseRefCount();
             refCounter_ = p.refCounter_;
             p.refCounter_ = nullptr;
@@ -112,11 +111,11 @@ public:
         return *this;
     }
 
-    template <class P> SharedPtr &operator=(const SharedPtr<P> &p)
+    template <class P>
+    SharedPtr& operator=(const SharedPtr<P>& p)
     {
-        (void)static_cast<T *>(p.Get()); // static_cast to ensure type T and P are compatible
-        if (refCounter_ != p.refCounter_)
-        {
+        (void)static_cast<T*>(p.Get()); // static_cast to ensure type T and P are compatible
+        if (refCounter_ != p.refCounter_) {
             DecreaseRefCount();
             refCounter_ = p.refCounter_;
             IncreaseRefCount();
@@ -125,7 +124,7 @@ public:
     }
 
 private:
-    SharedPtr(RefCounted::RefCounter *refCounter) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    SharedPtr(RefCounted::RefCounter* refCounter) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
         : refCounter_(refCounter)
     {
         IncreaseRefCount();
@@ -133,73 +132,78 @@ private:
 
     void IncreaseRefCount()
     {
-        if (refCounter_ != nullptr)
-        {
+        if (refCounter_ != nullptr) {
             refCounter_->IncreaseShared();
         }
     }
     void DecreaseRefCount()
     {
-        if (refCounter_ != nullptr)
-        {
+        if (refCounter_ != nullptr) {
             refCounter_->DecreaseShared();
         }
     }
 
 private:
-    RefCounted::RefCounter *refCounter_;
+    RefCounted::RefCounter* refCounter_;
 
-    template <class P> friend class SharedPtr;
-    template <class P> friend class WeakPtr;
-    template <class Q, class P> friend bool operator==(const SharedPtr<Q> &t, const SharedPtr<P> &p);
-    template <class Q, class P> friend bool operator!=(const SharedPtr<Q> &t, const SharedPtr<P> &p);
+    template <class P>
+    friend class SharedPtr;
+    template <class P>
+    friend class WeakPtr;
+    template <class Q, class P>
+    friend bool operator==(const SharedPtr<Q>& t, const SharedPtr<P>& p);
+    template <class Q, class P>
+    friend bool operator!=(const SharedPtr<Q>& t, const SharedPtr<P>& p);
 };
 
-template <class T> class WeakPtr
-{
+template <class T>
+class WeakPtr {
 public:
-    WeakPtr() : refCounter_(nullptr)
+    WeakPtr()
+        : refCounter_(nullptr)
     {
     }
 
-    WeakPtr(T *p) : refCounter_(nullptr) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    WeakPtr(T* p)
+        : refCounter_(nullptr) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
     {
-        if (p != nullptr)
-        {
-            refCounter_ = static_cast<RefCounted *>(p)->refCounter_;
+        if (p != nullptr) {
+            refCounter_ = static_cast<RefCounted*>(p)->refCounter_;
             SSASSERT(refCounter_ != nullptr);
             refCounter_->IncreaseWeak();
         }
     }
 
-    WeakPtr(const SharedPtr<T> &p) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    WeakPtr(const SharedPtr<T>& p) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
         : refCounter_(p.refCounter_)
     {
         IncreaseRefCount();
     }
 
     template <class P>
-    WeakPtr(const SharedPtr<P> &p) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    WeakPtr(const SharedPtr<P>& p) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
         : refCounter_(p.refCounter_)
     {
-        (void)static_cast<T *>(p.Get()); // static_cast to ensure type T and P are compatible
+        (void)static_cast<T*>(p.Get()); // static_cast to ensure type T and P are compatible
         IncreaseRefCount();
     }
 
     template <class P>
-    WeakPtr(const WeakPtr<P> &p) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    WeakPtr(const WeakPtr<P>& p) // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
         : refCounter_(p.refCounter_)
     {
-        (void)static_cast<T *>(p.Get()); // to ensure type T and P are compatible
+        (void)static_cast<T*>(p.Get()); // to ensure type T and P are compatible
         IncreaseRefCount();
     }
 
-    WeakPtr(const WeakPtr &p) : refCounter_(p.refCounter_)
+    WeakPtr(const WeakPtr& p)
+        : refCounter_(p.refCounter_)
     {
         IncreaseRefCount();
     }
 
-    WeakPtr(WeakPtr &&p) noexcept : refCounter_(p.refCounter_)
+    WeakPtr(WeakPtr&& p) noexcept
+        : refCounter_(p.refCounter_)
     {
         p.refCounter_ = nullptr;
     }
@@ -211,17 +215,15 @@ public:
 
     SharedPtr<T> Lock() const
     {
-        if (refCounter_ == nullptr || refCounter_->Expired())
-        {
+        if (refCounter_ == nullptr || refCounter_->Expired()) {
             return nullptr;
         }
         return SharedPtr<T>(refCounter_);
     }
 
-    WeakPtr &operator=(const WeakPtr &p)
+    WeakPtr& operator=(const WeakPtr& p)
     {
-        if (p.refCounter_ != refCounter_)
-        {
+        if (p.refCounter_ != refCounter_) {
             DecreaseRefCount();
             refCounter_ = p.refCounter_;
             IncreaseRefCount();
@@ -229,10 +231,9 @@ public:
         return *this;
     }
 
-    WeakPtr &operator=(WeakPtr &&p) noexcept
+    WeakPtr& operator=(WeakPtr&& p) noexcept
     {
-        if (p.refCounter_ != refCounter_)
-        {
+        if (p.refCounter_ != refCounter_) {
             DecreaseRefCount();
             refCounter_ = p.refCounter_;
             p.refCounter_ = nullptr;
@@ -240,11 +241,11 @@ public:
         return *this;
     }
 
-    template <class P> WeakPtr &operator=(const WeakPtr<P> &p)
+    template <class P>
+    WeakPtr& operator=(const WeakPtr<P>& p)
     {
-        (void)static_cast<T *>(p.Get()); // static_cast to ensure type T and P are compatible
-        if (p.refCounter_ != refCounter_)
-        {
+        (void)static_cast<T*>(p.Get()); // static_cast to ensure type T and P are compatible
+        if (p.refCounter_ != refCounter_) {
             DecreaseRefCount();
             refCounter_ = p.refCounter_;
             IncreaseRefCount();
@@ -255,82 +256,95 @@ public:
 private:
     void IncreaseRefCount()
     {
-        if (refCounter_ != nullptr)
-        {
+        if (refCounter_ != nullptr) {
             refCounter_->IncreaseWeak();
         }
     }
     void DecreaseRefCount()
     {
-        if (refCounter_ != nullptr)
-        {
+        if (refCounter_ != nullptr) {
             refCounter_->DecreaseWeak();
         }
     }
 
 private:
-    RefCounted::RefCounter *refCounter_;
-    template <class P> friend class WeakPtr;
-    template <class Q, class P> friend bool operator!=(const WeakPtr<Q> &t, const WeakPtr<P> &p);
-    template <class Q, class P> friend bool operator!=(const WeakPtr<Q> &t, const WeakPtr<P> &p);
+    RefCounted::RefCounter* refCounter_;
+    template <class P>
+    friend class WeakPtr;
+    template <class Q, class P>
+    friend bool operator!=(const WeakPtr<Q>& t, const WeakPtr<P>& p);
+    template <class Q, class P>
+    friend bool operator!=(const WeakPtr<Q>& t, const WeakPtr<P>& p);
 };
 
-template <class T, class P> inline bool operator==(const SharedPtr<T> &t, const SharedPtr<P> &p)
+template <class T, class P>
+inline bool operator==(const SharedPtr<T>& t, const SharedPtr<P>& p)
 {
     return t.refCounter_ == p.refCounter_;
 }
 
-template <class T, class P> inline bool operator!=(const SharedPtr<T> &t, const SharedPtr<P> &p)
+template <class T, class P>
+inline bool operator!=(const SharedPtr<T>& t, const SharedPtr<P>& p)
 {
     return t.refCounter_ != p.refCounter_;
 }
 
-template <class T, class P> inline bool operator==(const SharedPtr<T> &t, const P *p)
+template <class T, class P>
+inline bool operator==(const SharedPtr<T>& t, const P* p)
 {
     return t.Get() == p;
 }
 
-template <class T> inline bool operator==(const SharedPtr<T> &t, decltype(nullptr))
+template <class T>
+inline bool operator==(const SharedPtr<T>& t, decltype(nullptr))
 {
     return t.Get() == nullptr;
 }
 
-template <class T> inline bool operator==(decltype(nullptr), const SharedPtr<T> &t)
+template <class T>
+inline bool operator==(decltype(nullptr), const SharedPtr<T>& t)
 {
     return t.Get() == nullptr;
 }
 
-template <class T, class P> inline bool operator!=(const SharedPtr<T> &t, const P *p)
+template <class T, class P>
+inline bool operator!=(const SharedPtr<T>& t, const P* p)
 {
     return t.Get() != p;
 }
 
-template <class T, class P> inline bool operator==(const P *p, const SharedPtr<T> &t)
+template <class T, class P>
+inline bool operator==(const P* p, const SharedPtr<T>& t)
 {
     return t.Get() == p;
 }
 
-template <class T, class P> inline bool operator!=(const P *p, const SharedPtr<T> &t)
+template <class T, class P>
+inline bool operator!=(const P* p, const SharedPtr<T>& t)
 {
     return t.Get() != p;
 }
 
-template <class T, class P> inline bool operator==(const WeakPtr<T> &t, const WeakPtr<P> &p)
+template <class T, class P>
+inline bool operator==(const WeakPtr<T>& t, const WeakPtr<P>& p)
 {
     return t.refCounter_ == p.refCounter_;
 }
 
-template <class T, class P> inline bool operator!=(const WeakPtr<T> &t, const WeakPtr<P> &p)
+template <class T, class P>
+inline bool operator!=(const WeakPtr<T>& t, const WeakPtr<P>& p)
 {
     return t.refCounter_ != p.refCounter_;
 }
 
-template <class T, class... Args> inline SharedPtr<T> MakeShared(Args &&... args)
+template <class T, class... Args>
+inline SharedPtr<T> MakeShared(Args&&... args)
 {
     return SharedPtr<T>(new T(std::forward<Args>(args)...));
 }
 
-template <class T> void _ScopedPtrDefaultDestructor(T *t)
+template <class T>
+void _ScopedPtrDefaultDestructor(T* t)
 {
     delete t;
 }

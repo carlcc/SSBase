@@ -5,17 +5,14 @@
 #include "Variant.h"
 #include "Ptr.h"
 
-namespace ss
-{
+namespace ss {
 
 void Variant::SetType(Variant::Type t)
 {
-    if (type_ == t)
-    {
+    if (type_ == t) {
         return;
     }
-    switch (type_)
-    {
+    switch (type_) {
     case Type::kTypeInt:
     case Type::kTypeInt64:
     case Type::kTypeFloat:
@@ -55,8 +52,7 @@ void Variant::SetType(Variant::Type t)
 
     type_ = t;
 
-    switch (type_)
-    {
+    switch (type_) {
     case Type::kTypeInt:
     case Type::kTypeInt64:
     case Type::kTypeFloat:
@@ -95,12 +91,11 @@ void Variant::SetType(Variant::Type t)
     }
 }
 
-Variant &Variant::operator=(const Variant &v)
+Variant& Variant::operator=(const Variant& v)
 {
     SetType(v.type_);
 
-    switch (type_)
-    {
+    switch (type_) {
     case Type::kTypeInt:
         value_.int_ = v.value_.int_;
         break;
@@ -180,12 +175,11 @@ Variant &Variant::operator=(const Variant &v)
     return *this;
 }
 
-Variant &Variant::operator=(Variant &&v) noexcept
+Variant& Variant::operator=(Variant&& v) noexcept
 {
     SetType(v.type_);
 
-    switch (type_)
-    {
+    switch (type_) {
     case Type::kTypeInt:
         value_.int_ = v.value_.int_;
         break;
@@ -266,16 +260,14 @@ Variant &Variant::operator=(Variant &&v) noexcept
     return *this;
 }
 
-bool operator==(const Variant &a, const Variant &b)
+bool operator==(const Variant& a, const Variant& b)
 {
-    if (a.GetType() != b.GetType())
-    {
+    if (a.GetType() != b.GetType()) {
         return false;
     }
 
     using Type = Variant::Type;
-    switch (a.GetType())
-    {
+    switch (a.GetType()) {
     case Type::kTypeInt:
         return a.value_.int_ == b.value_.int_;
     case Type::kTypeInt64:
@@ -330,7 +322,7 @@ bool operator==(const Variant &a, const Variant &b)
     }
 }
 
-bool operator!=(const Variant &a, const Variant &b)
+bool operator!=(const Variant& a, const Variant& b)
 {
     return !(a == b);
 }

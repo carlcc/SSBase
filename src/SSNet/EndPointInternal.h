@@ -7,11 +7,9 @@
 #include "EndPoint.h"
 #include <uv.h>
 
-namespace ss
-{
+namespace ss {
 
-struct EndPoint::Impl
-{
+struct EndPoint::Impl {
     union {
         sockaddr addr_;
         sockaddr_in6 addr6_;

@@ -8,24 +8,20 @@
 #include <cstdio>
 #include <cstdlib>
 
-#define SSASSERT(condition)                                                                                            \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        if (!(condition))                                                                                              \
-        {                                                                                                              \
-            printf("%s:%d: %s got result false. ", __FILE__, __LINE__, #condition);                                    \
-            fflush(stdout);                                                                                            \
-            abort();                                                                                                   \
-        }                                                                                                              \
+#define SSASSERT(condition)                                                         \
+    do {                                                                            \
+        if (!(condition)) {                                                         \
+            printf("%s:%d: %s got result false. ", __FILE__, __LINE__, #condition); \
+            fflush(stdout);                                                         \
+            abort();                                                                \
+        }                                                                           \
     } while (false)
 
-#define SSASSERT2(condition, msg, ...)                                                                                 \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        if (!(condition))                                                                                              \
-        {                                                                                                              \
-            printf("%s:%d: %s got result false. " msg, __FILE__, __LINE__, #condition, ##__VA_ARGS__);                 \
-            fflush(stdout);                                                                                            \
-            abort();                                                                                                   \
-        }                                                                                                              \
+#define SSASSERT2(condition, msg, ...)                                                                 \
+    do {                                                                                               \
+        if (!(condition)) {                                                                            \
+            printf("%s:%d: %s got result false. " msg, __FILE__, __LINE__, #condition, ##__VA_ARGS__); \
+            fflush(stdout);                                                                            \
+            abort();                                                                                   \
+        }                                                                                              \
     } while (false)

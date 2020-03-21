@@ -21,21 +21,18 @@
 #include <unistd.h>
 #endif
 
-namespace ss
-{
+namespace ss {
 
 #ifdef SS_PLATFORM_WIN32
 // Initialize Winsock.
 
-class __WindowsSocketInitHelper
-{
+class __WindowsSocketInitHelper {
 public:
     __WindowsSocketInitHelper()
     {
         WSADATA wsaData;
         int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-        if (iResult != NO_ERROR)
-        {
+        if (iResult != NO_ERROR) {
             wprintf(L"WSAStartup failed with error: %ld\n", iResult);
             exit(1);
         }
@@ -48,12 +45,12 @@ public:
 static __WindowsSocketInitHelper __windowsSocketInitHelper;
 #endif
 
-class TcpSocketImpl : public TcpSocket
-{
+class TcpSocketImpl : public TcpSocket {
     SS_OBJECT(TcpSocketImpl, TcpSocket)
 public:
     // This object will take the ownship of fd
-    TcpSocketImpl(SOCKET fd) : sockFd_(fd)
+    TcpSocketImpl(SOCKET fd)
+        : sockFd_(fd)
     {
     }
     ~TcpSocketImpl()
@@ -61,13 +58,13 @@ public:
         Close();
     }
 
-    int Connect(const EndPoint &ep) override
+    int Connect(const EndPoint& ep) override
     {
         int nameLen = ep.IsIPV4() ? sizeof(sockaddr_in) : sizeof(sockaddr_in6);
         return connect(sockFd_, &ep.impl_->addr_, nameLen);
     }
 
-    int Bind(const EndPoint &ep) override
+    int Bind(const EndPoint& ep) override
     {
         int nameLen = ep.IsIPV4() ? sizeof(sockaddr_in) : sizeof(sockaddr_in6);
         return bind(sockFd_, &ep.impl_->addr_, nameLen);
@@ -81,27 +78,25 @@ public:
     SharedPtr<TcpSocket> Accept() override
     {
         auto client = accept(sockFd_, nullptr, nullptr);
-        if (INVALID_SOCKET == client)
-        {
+        if (INVALID_SOCKET == client) {
             return nullptr;
         }
         return MakeShared<TcpSocketImpl>(client);
     }
 
-    int Send(const void *data, uint32_t length) override
+    int Send(const void* data, uint32_t length) override
     {
-        return send(sockFd_, (const char *)data, int(length), 0);
+        return send(sockFd_, (const char*)data, int(length), 0);
     }
 
-    int Receive(void *buf, uint32_t size) override
+    int Receive(void* buf, uint32_t size) override
     {
-        return recv(sockFd_, (char *)buf, int(size), 0);
+        return recv(sockFd_, (char*)buf, int(size), 0);
     }
 
     void Close() override
     {
-        if (INVALID_SOCKET != sockFd_)
-        {
+        if (INVALID_SOCKET != sockFd_) {
 #ifdef SS_PLATFORM_WIN32
             closesocket(sockFd_);
 #else
@@ -124,7 +119,7 @@ public:
         if (0 == ioctlsocket(sockFd_, FIONREAD, &avalable))
 #else
         u_long avalable = 0;
-        if (0 == ioctl(sockFd_, FIONREAD, (char *)&avalable))
+        if (0 == ioctl(sockFd_, FIONREAD, (char*)&avalable))
 #endif
         {
             return (int)avalable;
@@ -138,7 +133,7 @@ public:
 #ifdef SS_PLATFORM_WIN32
         return ioctlsocket(sockFd_, FIONBIO, &mode);
 #else
-        return ioctl(sockFd_, FIONBIO, (char *)&mode);
+        return ioctl(sockFd_, FIONBIO, (char*)&mode);
 #endif
     }
 
@@ -147,13 +142,12 @@ public:
 #ifdef SS_PLATFORM_WIN32
         DWORD timeout = millis < 0 ? 0 : millis;
 #else
-        if (millis < 0)
-        {
+        if (millis < 0) {
             millis = 0;
         }
-        struct timeval timeout = {millis / 1000, millis % 1000};
+        struct timeval timeout = { millis / 1000, millis % 1000 };
 #endif
-        return setsockopt(sockFd_, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout));
+        return setsockopt(sockFd_, SOL_SOCKET, SO_SNDTIMEO, (const char*)&timeout, sizeof(timeout));
     }
 
     int SetReceiveTimeout(int millis) override
@@ -161,19 +155,18 @@ public:
 #ifdef SS_PLATFORM_WIN32
         DWORD timeout = millis < 0 ? 0 : millis;
 #else
-        if (millis < 0)
-        {
+        if (millis < 0) {
             millis = 0;
         }
-        struct timeval timeout = {millis / 1000, millis % 1000};
+        struct timeval timeout = { millis / 1000, millis % 1000 };
 #endif
-        return setsockopt(sockFd_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout));
+        return setsockopt(sockFd_, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout));
     }
 
     int SetNoDelay(bool b) override
     {
         int flag = b ? 1 : 0;
-        return setsockopt(sockFd_, IPPROTO_TCP, TCP_NODELAY, (const char *)&flag, sizeof(flag));
+        return setsockopt(sockFd_, IPPROTO_TCP, TCP_NODELAY, (const char*)&flag, sizeof(flag));
     }
 
 private:

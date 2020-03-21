@@ -5,20 +5,19 @@
 #include "AsyncTcpSocket.h"
 #include "EndPoint.h"
 
-namespace ss
-{
+namespace ss {
 
-int AsyncTcpSocket::Connect(const String &host, uint16_t port, OnConnectCb &&cb)
+int AsyncTcpSocket::Connect(const String& host, uint16_t port, OnConnectCb&& cb)
 {
     return Connect(EndPoint(host, port), std::forward<OnConnectCb>(cb));
 }
 
-int AsyncTcpSocket::Bind(const String &hostAndIp)
+int AsyncTcpSocket::Bind(const String& hostAndIp)
 {
     return Bind(EndPoint(hostAndIp));
 }
 
-int AsyncTcpSocket::Bind(const String &host, uint16_t port)
+int AsyncTcpSocket::Bind(const String& host, uint16_t port)
 {
     return Bind(EndPoint(host, port));
 }

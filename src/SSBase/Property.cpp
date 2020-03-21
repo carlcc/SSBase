@@ -4,7 +4,6 @@
 
 #include "Property.h"
 
-namespace ss
-{
+namespace ss {
 
 }

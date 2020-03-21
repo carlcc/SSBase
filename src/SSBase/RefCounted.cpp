@@ -4,7 +4,6 @@
 
 #include "RefCounted.h"
 
-namespace ss
-{
+namespace ss {
 
 }

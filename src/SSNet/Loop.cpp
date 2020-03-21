@@ -7,13 +7,12 @@
 #include "impl/AsyncTcpSocketImpl.h"
 #include <uv.h>
 
-namespace ss
-{
+namespace ss {
 
-class Loop::LoopImpl
-{
+class Loop::LoopImpl {
 public:
-    LoopImpl() : loop_{}
+    LoopImpl()
+        : loop_ {}
     {
         uv_loop_init(&loop_);
     }
@@ -36,7 +35,8 @@ public:
     uv_loop_t loop_;
 };
 
-Loop::Loop() : impl_(new LoopImpl)
+Loop::Loop()
+    : impl_(new LoopImpl)
 {
 }
 
@@ -57,10 +57,9 @@ void Loop::Stop()
 
 SharedPtr<AsyncTcpSocket> Loop::CreateTcpSocket()
 {
-    auto *data = new AsyncTcpSocketImpl::Data;
+    auto* data = new AsyncTcpSocketImpl::Data;
 
-    if (0 != uv_tcp_init(&impl_->loop_, (uv_tcp_t *)data))
-    {
+    if (0 != uv_tcp_init(&impl_->loop_, (uv_tcp_t*)data)) {
         delete data;
         return nullptr;
     }

@@ -13,11 +13,9 @@
 #ifdef SS_PLATFORM_WIN32
 #include <Windows.h>
 
-namespace ss
-{
+namespace ss {
 // To make windows console print utf8 strings properly
-class WindowsUtf8ConsoleHelper
-{
+class WindowsUtf8ConsoleHelper {
 public:
     WindowsUtf8ConsoleHelper()
     {
@@ -28,8 +26,7 @@ static WindowsUtf8ConsoleHelper __windowsUtf8ConsoleHelper;
 } // namespace ss
 #endif
 
-namespace ss
-{
+namespace ss {
 
 // modified version of utfcpp : https://github.com/ww898/utf-cpp
 // Supported combinations:
@@ -39,8 +36,7 @@ namespace ss
 //   1111_0xxx 10xx_xxxx 10xx_xxxx 10xx_xxxx
 //   1111_10xx 10xx_xxxx 10xx_xxxx 10xx_xxxx 10xx_xxxx
 //   1111_110x 10xx_xxxx 10xx_xxxx 10xx_xxxx 10xx_xxxx 10xx_xxxx
-struct utf8 final
-{
+struct utf8 final {
     static size_t const max_unicode_symbol_size = 4;
     static size_t const max_supported_symbol_size = 6;
 
@@ -48,7 +44,8 @@ struct utf8 final
 
     using char_type = uint8_t;
 
-    template <typename PeekFn> static size_t char_size(PeekFn &&peek_fn)
+    template <typename PeekFn>
+    static size_t char_size(PeekFn&& peek_fn)
     {
         char_type const ch0 = std::forward<PeekFn>(peek_fn)();
         if (ch0 < 0x80) // 0xxx_xxxx
@@ -70,7 +67,8 @@ struct utf8 final
         // throw std::runtime_error("The utf8 first char in sequence is incorrect");
     }
 
-    template <typename ReadFn> static uint32_t read(ReadFn &&read_fn)
+    template <typename ReadFn>
+    static uint32_t read(ReadFn&& read_fn)
     {
         char_type const ch0 = read_fn();
         if (ch0 < 0x80) // 0xxx_xxxx
@@ -150,7 +148,8 @@ struct utf8 final
         throw std::runtime_error("The utf8 slave char in sequence is incorrect");
     }
 
-    template <typename WriteFn> static void write(uint32_t const cp, WriteFn &&write_fn)
+    template <typename WriteFn>
+    static void write(uint32_t const cp, WriteFn&& write_fn)
     {
         if (cp < 0x80) // 0xxx_xxxx
             write_fn(static_cast<char_type>(cp));
@@ -158,28 +157,23 @@ struct utf8 final
         {
             write_fn(static_cast<char_type>(0xC0 | cp >> 6));
             goto _1;
-        }
-        else if (cp < 0x10000) // 1110_xxxx 10xx_xxxx 10xx_xxxx
+        } else if (cp < 0x10000) // 1110_xxxx 10xx_xxxx 10xx_xxxx
         {
             write_fn(static_cast<char_type>(0xE0 | cp >> 12));
             goto _2;
-        }
-        else if (cp < 0x200000) // 1111_0xxx 10xx_xxxx 10xx_xxxx 10xx_xxxx
+        } else if (cp < 0x200000) // 1111_0xxx 10xx_xxxx 10xx_xxxx 10xx_xxxx
         {
             write_fn(static_cast<char_type>(0xF0 | cp >> 18));
             goto _3;
-        }
-        else if (cp < 0x4000000) // 1111_10xx 10xx_xxxx 10xx_xxxx 10xx_xxxx 10xx_xxxx
+        } else if (cp < 0x4000000) // 1111_10xx 10xx_xxxx 10xx_xxxx 10xx_xxxx 10xx_xxxx
         {
             write_fn(static_cast<char_type>(0xF8 | cp >> 24));
             goto _4;
-        }
-        else if (cp < 0x80000000) // 1111_110x 10xx_xxxx 10xx_xxxx 10xx_xxxx 10xx_xxxx 10xx_xxxx
+        } else if (cp < 0x80000000) // 1111_110x 10xx_xxxx 10xx_xxxx 10xx_xxxx 10xx_xxxx 10xx_xxxx
         {
             write_fn(static_cast<char_type>(0xFC | cp >> 30));
             goto _5;
-        }
-        else
+        } else
             throw std::runtime_error("Tool large UTF8 code point");
         return;
     _5:
@@ -195,19 +189,18 @@ struct utf8 final
     }
 };
 
-struct CharSequence::SequenceData
-{
-    CharType *chars_;
+struct CharSequence::SequenceData {
+    CharType* chars_;
 
     explicit SequenceData(uint32_t length)
     {
-        chars_ = static_cast<CharType *>(malloc(length * sizeof(CharType)));
+        chars_ = static_cast<CharType*>(malloc(length * sizeof(CharType)));
     }
 
-    SequenceData(const SequenceData &) = delete;
-    SequenceData(SequenceData &&) = delete;
-    SequenceData &operator=(const SequenceData &) = delete;
-    SequenceData &operator=(SequenceData &&) = delete;
+    SequenceData(const SequenceData&) = delete;
+    SequenceData(SequenceData&&) = delete;
+    SequenceData& operator=(const SequenceData&) = delete;
+    SequenceData& operator=(SequenceData&&) = delete;
 
     ~SequenceData()
     {
@@ -216,7 +209,7 @@ struct CharSequence::SequenceData
 
     void ReAllocate(uint32_t length)
     {
-        chars_ = static_cast<CharType *>(realloc(chars_, length * sizeof(CharType)));
+        chars_ = static_cast<CharType*>(realloc(chars_, length * sizeof(CharType)));
     }
 };
 
@@ -260,12 +253,10 @@ CharSequence::CharType CharSequence::ToUpper(CharSequence::CharType c)
     const uint32_t aa = L'ａ';
     const uint32_t AA = L'Ａ';
     const uint32_t zz = L'ｚ';
-    if (c >= a && c <= z)
-    {
+    if (c >= a && c <= z) {
         return c + A - a;
     }
-    if (c >= aa && c <= zz)
-    {
+    if (c >= aa && c <= zz) {
         return c + AA - aa;
     }
     return c;
@@ -279,12 +270,10 @@ CharSequence::CharType CharSequence::ToLower(CharSequence::CharType c)
     const uint32_t aa = L'ａ';
     const uint32_t AA = L'Ａ';
     const uint32_t ZZ = L'Ｚ';
-    if (c >= A && c <= Z)
-    {
+    if (c >= A && c <= Z) {
         return c + a - A;
     }
-    if (c >= AA && c <= ZZ)
-    {
+    if (c >= AA && c <= ZZ) {
         return c + aa - AA;
     }
     return c;
@@ -292,8 +281,7 @@ CharSequence::CharType CharSequence::ToLower(CharSequence::CharType c)
 
 bool CharSequence::IsWhiteSpace(CharSequence::CharType c)
 {
-    enum Spaces : uint32_t
-    {
+    enum Spaces : uint32_t {
         ///
         TABULATION = 0x0009,
         LINE_FEED = 0x000A,
@@ -353,14 +341,15 @@ bool CharSequence::IsWhiteSpace(CharSequence::CharType c)
     return kSpaces.find(c) != kSpaces.end();
 }
 
-CharSequence::CharSequence() : sequenceData_(nullptr), length_(0)
+CharSequence::CharSequence()
+    : sequenceData_(nullptr)
+    , length_(0)
 {
 }
 
 String CharSequence::SubString(uint32_t from, uint32_t length) const
 {
-    if (from >= Length())
-    {
+    if (from >= Length()) {
         return String();
     }
     if (uint64_t(from) + length > Length()) // from + length may larger than 2^32-1
@@ -375,32 +364,27 @@ StringView CharSequence::SubStringView(uint32_t from, uint32_t length) const
     return SubStringViewImpl(from, length);
 }
 
-int CharSequence::Compare(const CharSequence &s) const
+int CharSequence::Compare(const CharSequence& s) const
 {
     uint32_t n = Length() > s.Length() ? s.Length() : Length();
-    for (uint32_t i = 0; i < n; ++i)
-    {
-        if (At(i) > s.At(i))
-        {
+    for (uint32_t i = 0; i < n; ++i) {
+        if (At(i) > s.At(i)) {
             return 1;
         }
-        if (At(i) < s.At(i))
-        {
+        if (At(i) < s.At(i)) {
             return -1;
         }
     }
-    if (Length() > s.Length())
-    {
+    if (Length() > s.Length()) {
         return 1;
     }
-    if (Length() < s.Length())
-    {
+    if (Length() < s.Length()) {
         return -1;
     }
     return 0;
 }
 
-int CharSequence::CompareIgnoreCase(const CharSequence &s) const
+int CharSequence::CompareIgnoreCase(const CharSequence& s) const
 {
     String thisStr(*this);
     String otherStr(s);
@@ -409,60 +393,52 @@ int CharSequence::CompareIgnoreCase(const CharSequence &s) const
     return thisStr.Compare(otherStr);
 }
 
-bool CharSequence::StartsWith(const CharSequence &s) const
+bool CharSequence::StartsWith(const CharSequence& s) const
 {
     return Length() >= s.Length() && memcmp(Data(), s.Data(), s.Length() * sizeof(CharType)) == 0;
 }
 
-bool CharSequence::StartsWith(const String &s) const
+bool CharSequence::StartsWith(const String& s) const
 {
-    return StartsWith((const CharSequence &)s);
+    return StartsWith((const CharSequence&)s);
 }
 
-bool CharSequence::EndsWith(const CharSequence &s) const
+bool CharSequence::EndsWith(const CharSequence& s) const
 {
-    return Length() >= s.Length() &&
-           memcmp(Data() + Length() - s.Length(), s.Data(), s.Length() * sizeof(CharType)) == 0;
+    return Length() >= s.Length() && memcmp(Data() + Length() - s.Length(), s.Data(), s.Length() * sizeof(CharType)) == 0;
 }
 
-bool CharSequence::EndsWith(const String &s) const
+bool CharSequence::EndsWith(const String& s) const
 {
-    return EndsWith((const CharSequence &)s);
+    return EndsWith((const CharSequence&)s);
 }
 
-uint32_t CharSequence::Find(const CharSequence &s, uint32_t start) const
+uint32_t CharSequence::Find(const CharSequence& s, uint32_t start) const
 {
-    if (Length() < s.Length() + start)
-    {
+    if (Length() < s.Length() + start) {
         return kNPos;
     }
     uint32_t n = Length() - s.Length() + 1;
-    for (uint32_t i = start; i < n; ++i)
-    {
-        if (memcmp(Data() + i, s.Data(), s.Length() * sizeof(CharType)) == 0)
-        {
+    for (uint32_t i = start; i < n; ++i) {
+        if (memcmp(Data() + i, s.Data(), s.Length() * sizeof(CharType)) == 0) {
             return i;
         }
     }
     return kNPos;
 }
 
-uint32_t CharSequence::RFind(const CharSequence &s, uint32_t end) const
+uint32_t CharSequence::RFind(const CharSequence& s, uint32_t end) const
 {
-    if (end > Length())
-    {
+    if (end > Length()) {
         end = Length();
     }
-    if (end < s.Length())
-    {
+    if (end < s.Length()) {
         return kNPos;
     }
 
     uint32_t n = end - s.Length() + 1;
-    for (uint32_t i = n; i > 0; --i)
-    {
-        if (memcmp(Data() + i - 1, s.Data(), s.Length() * sizeof(CharType)) == 0)
-        {
+    for (uint32_t i = n; i > 0; --i) {
+        if (memcmp(Data() + i - 1, s.Data(), s.Length() * sizeof(CharType)) == 0) {
             return i - 1;
         }
     }
@@ -471,16 +447,14 @@ uint32_t CharSequence::RFind(const CharSequence &s, uint32_t end) const
 
 void CharSequence::ToUpper()
 {
-    for (uint32_t i = 0; i < Length(); ++i)
-    {
+    for (uint32_t i = 0; i < Length(); ++i) {
         At(i) = ToUpper(At(i));
     }
 }
 
 void CharSequence::ToLower()
 {
-    for (uint32_t i = 0; i < Length(); ++i)
-    {
+    for (uint32_t i = 0; i < Length(); ++i) {
         At(i) = ToLower(At(i));
     }
 }
@@ -499,21 +473,18 @@ String CharSequence::CopyToLower() const
     return copy;
 }
 
-String CharSequence::ReplaceAll(const CharSequence &oldStr, const CharSequence &newStr)
+String CharSequence::ReplaceAll(const CharSequence& oldStr, const CharSequence& newStr)
 {
     std::vector<StringView> split = Split(oldStr);
     String result(split[0]);
-    if (split.size() > 1)
-    {
+    if (split.size() > 1) {
         uint32_t length = uint32_t((split.size() - 1) * newStr.Length());
-        for (auto &sv : split)
-        {
+        for (auto& sv : split) {
             length += sv.Length();
         }
 
         result.Reserve(length);
-        for (size_t i = 1; i < split.size(); ++i)
-        {
+        for (size_t i = 1; i < split.size(); ++i) {
             result += newStr;
             result += split[i];
         }
@@ -522,39 +493,37 @@ String CharSequence::ReplaceAll(const CharSequence &oldStr, const CharSequence &
     return result;
 }
 
-String CharSequence::ReplaceAll(const String &oldStr, const CharSequence &newStr)
+String CharSequence::ReplaceAll(const String& oldStr, const CharSequence& newStr)
 {
-    return ReplaceAll((const CharSequence &)oldStr, (const CharSequence &)newStr);
+    return ReplaceAll((const CharSequence&)oldStr, (const CharSequence&)newStr);
 }
 
-String CharSequence::ReplaceAll(const CharSequence &oldStr, const String &newStr)
+String CharSequence::ReplaceAll(const CharSequence& oldStr, const String& newStr)
 {
-    return ReplaceAll((const CharSequence &)oldStr, (const CharSequence &)newStr);
+    return ReplaceAll((const CharSequence&)oldStr, (const CharSequence&)newStr);
 }
 
-String CharSequence::ReplaceAll(const String &oldStr, const String &newStr)
+String CharSequence::ReplaceAll(const String& oldStr, const String& newStr)
 {
-    return ReplaceAll((const CharSequence &)oldStr, (const CharSequence &)newStr);
+    return ReplaceAll((const CharSequence&)oldStr, (const CharSequence&)newStr);
 }
 
 uint32_t CharSequence::GetBytesLength(CharSequence::CharSet charSet) const
 {
     SSASSERT(charSet == kUtf8);
     uint32_t utf8Length = 0;
-    for (uint32_t i = 0; i < Length(); ++i)
-    {
+    for (uint32_t i = 0; i < Length(); ++i) {
         utf8::write(At(i), [&utf8Length](utf8::char_type c) { ++utf8Length; });
     }
     return utf8Length;
 }
 
-void CharSequence::GetBytes(CharSet charSet, void *buffer) const
+void CharSequence::GetBytes(CharSet charSet, void* buffer) const
 {
     SSASSERT(charSet == kUtf8);
-    auto *p = static_cast<utf8::char_type *>(buffer);
+    auto* p = static_cast<utf8::char_type*>(buffer);
     uint32_t index = 0;
-    for (uint32_t i = 0; i < Length(); ++i)
-    {
+    for (uint32_t i = 0; i < Length(); ++i) {
         utf8::write(At(i), [p, &index](utf8::char_type c) { p[index++] = c; });
     }
     p[index] = '\0';
@@ -565,15 +534,14 @@ std::string CharSequence::ToStdString(CharSequence::CharSet charSet) const
     uint32_t utf8Length = GetBytesLength(charSet);
 
     std::string ss(utf8Length, '\0');
-    GetBytes(CharSequence::kUtf8, const_cast<char *>(ss.data()));
+    GetBytes(CharSequence::kUtf8, const_cast<char*>(ss.data()));
     return ss;
 }
 
 std::wstring CharSequence::ToStdWString() const
 {
     std::wstring ss(Length(), L'\0');
-    for (uint32_t i = 0; i < Length(); ++i)
-    {
+    for (uint32_t i = 0; i < Length(); ++i) {
         ss[i] = At(i);
     }
     return ss;
@@ -583,28 +551,30 @@ uint64_t CharSequence::Hash() const
 {
     // djb2
     uint64_t hash = 5381;
-    for (uint32_t i = 0; i < Length(); ++i)
-    {
+    for (uint32_t i = 0; i < Length(); ++i) {
         hash = ((hash << 5u) + hash) + At(i); /* hash * 33 + c */
     }
     return hash;
 }
 
-StringView::StringView(SequenceData *sequenceData, uint32_t offset, uint32_t length) : CharSequence()
+StringView::StringView(SequenceData* sequenceData, uint32_t offset, uint32_t length)
+    : CharSequence()
 {
     sequenceData_ = sequenceData;
     offset_ = offset;
     length_ = length;
 }
 
-StringView::StringView(const StringView &sv) : CharSequence()
+StringView::StringView(const StringView& sv)
+    : CharSequence()
 {
     sequenceData_ = sv.sequenceData_;
     offset_ = sv.offset_;
     length_ = sv.length_;
 }
 
-StringView::StringView(StringView &&sv) noexcept : CharSequence()
+StringView::StringView(StringView&& sv) noexcept
+    : CharSequence()
 {
     sequenceData_ = sv.sequenceData_;
     offset_ = sv.offset_;
@@ -635,17 +605,17 @@ StringView StringView::SubStringViewImpl(uint32_t from, uint32_t length) const
     return StringView(sequenceData_, from, length);
 }
 
-CharSequence::CharType *StringView::Data()
+CharSequence::CharType* StringView::Data()
 {
     return sequenceData_->chars_ + offset_;
 }
 
-const CharSequence::CharType *StringView::Data() const
+const CharSequence::CharType* StringView::Data() const
 {
     return sequenceData_->chars_ + offset_;
 }
 
-StringView &StringView::operator=(const StringView &sv)
+StringView& StringView::operator=(const StringView& sv)
 {
     sequenceData_ = sv.sequenceData_;
     offset_ = sv.offset_;
@@ -653,7 +623,7 @@ StringView &StringView::operator=(const StringView &sv)
     return *this;
 }
 
-StringView &StringView::operator=(StringView &&sv) noexcept
+StringView& StringView::operator=(StringView&& sv) noexcept
 {
     sequenceData_ = sv.sequenceData_;
     offset_ = sv.offset_;
@@ -664,34 +634,38 @@ StringView &StringView::operator=(StringView &&sv) noexcept
     return *this;
 }
 
-String::String() : CharSequence(), capacity_(0)
+String::String()
+    : CharSequence()
+    , capacity_(0)
 {
     ReAllocate(16);
 }
 
-String::String(char c) : CharSequence(), capacity_(0)
+String::String(char c)
+    : CharSequence()
+    , capacity_(0)
 {
     ReAllocate(16);
     *this += c;
 }
 
-String::String(wchar_t c) : CharSequence(), capacity_(0)
+String::String(wchar_t c)
+    : CharSequence()
+    , capacity_(0)
 {
     ReAllocate(16);
     *this += c;
 }
 
-inline uint32_t GetUtf8Length(const char *utf8, uint32_t bytesCount)
+inline uint32_t GetUtf8Length(const char* utf8, uint32_t bytesCount)
 {
     uint32_t count = 0;
     uint32_t index = 0;
 
     auto fn = [&index, utf8]() -> utf8::char_type { return (utf8::char_type)utf8[index]; };
-    while (utf8[index] != 0 && index < bytesCount)
-    {
+    while (utf8[index] != 0 && index < bytesCount) {
         auto size = utf8::char_size(fn);
-        if (size == -1)
-        {
+        if (size == -1) {
             return count;
         }
         ++count;
@@ -705,7 +679,9 @@ inline uint32_t CalculateCapacity(uint32_t len)
     return Misc::CeilToPowerOfTwo(len);
 }
 
-String::String(const char *utf8, uint32_t bytesCount) : CharSequence(), capacity_(0)
+String::String(const char* utf8, uint32_t bytesCount)
+    : CharSequence()
+    , capacity_(0)
 {
     length_ = GetUtf8Length(utf8, bytesCount);
 
@@ -714,51 +690,56 @@ String::String(const char *utf8, uint32_t bytesCount) : CharSequence(), capacity
     uint32_t index = 0;
     auto readFn = [&index, utf8]() -> utf8::char_type { return (utf8::char_type)utf8[index++]; };
 
-    for (uint32_t i = 0; i < length_; ++i)
-    {
+    for (uint32_t i = 0; i < length_; ++i) {
         sequenceData_->chars_[i] = utf8::read(readFn);
     }
 }
 
-String::String(const wchar_t *unicode, uint32_t charCount) : CharSequence(), capacity_(0)
+String::String(const wchar_t* unicode, uint32_t charCount)
+    : CharSequence()
+    , capacity_(0)
 {
     length_ = uint32_t(wcslen(unicode));
-    if (length_ > charCount)
-    {
+    if (length_ > charCount) {
         length_ = charCount;
     }
     ReAllocate(CalculateCapacity(length_));
 
-    for (uint32_t i = 0; i < length_; ++i)
-    {
+    for (uint32_t i = 0; i < length_; ++i) {
         sequenceData_->chars_[i] = unicode[i];
     }
 }
 
-String::String(const CharSequence::CharType *chars, uint32_t length) : CharSequence(), capacity_(0)
+String::String(const CharSequence::CharType* chars, uint32_t length)
+    : CharSequence()
+    , capacity_(0)
 {
     length_ = length;
     ReAllocate(CalculateCapacity(length_));
 
-    for (uint32_t i = 0; i < length; ++i)
-    {
+    for (uint32_t i = 0; i < length; ++i) {
         sequenceData_->chars_[i] = chars[i];
     }
 }
 
-String::String(const CharSequence &s) : CharSequence(), capacity_(0)
+String::String(const CharSequence& s)
+    : CharSequence()
+    , capacity_(0)
 {
     length_ = s.Length();
     ReAllocate(CalculateCapacity(length_));
     memcpy(sequenceData_->chars_, s.Data(), length_ * sizeof(CharType));
 }
 
-String::String(const String &s) : CharSequence(), capacity_(0)
+String::String(const String& s)
+    : CharSequence()
+    , capacity_(0)
 {
-    new (this) String((CharSequence &)s);
+    new (this) String((CharSequence&)s);
 }
 
-String::String(String &&s) noexcept : CharSequence()
+String::String(String&& s) noexcept
+    : CharSequence()
 {
     length_ = s.length_;
     capacity_ = s.capacity_;
@@ -773,12 +754,12 @@ String::~String()
     Free();
 }
 
-CharSequence::CharType *String::Data()
+CharSequence::CharType* String::Data()
 {
     return sequenceData_->chars_;
 }
 
-const CharSequence::CharType *String::Data() const
+const CharSequence::CharType* String::Data() const
 {
     return sequenceData_->chars_;
 }
@@ -796,19 +777,19 @@ StringView String::SubStringViewImpl(uint32_t from, uint32_t length) const
     return StringView(sequenceData_, from, length);
 }
 
-String &String::operator=(const String &s)
+String& String::operator=(const String& s)
 {
-    operator=((const CharSequence &)s);
+    operator=((const CharSequence&)s);
     return *this;
 }
 
-String &String::operator+=(const String &s)
+String& String::operator+=(const String& s)
 {
-    operator+=((const CharSequence &)s);
+    operator+=((const CharSequence&)s);
     return *this;
 }
 
-String &String::operator=(String &&s) noexcept
+String& String::operator=(String&& s) noexcept
 {
     auto oldCap = capacity_;
     auto oldChars = sequenceData_->chars_;
@@ -822,10 +803,9 @@ String &String::operator=(String &&s) noexcept
     return *this;
 }
 
-String &String::operator=(const CharSequence &s)
+String& String::operator=(const CharSequence& s)
 {
-    if (Capacity() < s.Length())
-    {
+    if (Capacity() < s.Length()) {
         ReAllocate(CalculateCapacity(s.Length()));
     }
     length_ = s.Length();
@@ -833,117 +813,103 @@ String &String::operator=(const CharSequence &s)
     return *this;
 }
 
-String &String::operator+=(const CharSequence &s)
+String& String::operator+=(const CharSequence& s)
 {
-    if (s.Empty())
-    {
+    if (s.Empty()) {
         return *this;
     }
     auto oldLen = length_;
     auto sLen = s.Length(); // Use a temp var, in case `s` and this is same object
     length_ = oldLen + sLen;
-    if (Capacity() < length_)
-    {
+    if (Capacity() < length_) {
         ReAllocate(CalculateCapacity(length_));
     }
     memcpy(sequenceData_->chars_ + oldLen, s.Data(), sLen * sizeof(CharType));
     return *this;
 }
 
-String &String::operator=(const char *utf8)
+String& String::operator=(const char* utf8)
 {
     length_ = GetUtf8Length(utf8, kNPos);
-    if (Capacity() < length_)
-    {
+    if (Capacity() < length_) {
         ReAllocate(CalculateCapacity(length_));
     }
     uint32_t index = 0;
     auto readFn = [&index, utf8]() -> utf8::char_type { return (utf8::char_type)utf8[index++]; };
 
-    for (uint32_t i = 0; i < length_; ++i)
-    {
+    for (uint32_t i = 0; i < length_; ++i) {
         sequenceData_->chars_[i] = utf8::read(readFn);
     }
     return *this;
 }
 
-String &String::operator+=(const char *utf8)
+String& String::operator+=(const char* utf8)
 {
     auto utf8Len = GetUtf8Length(utf8, kNPos);
-    if (utf8Len == 0)
-    {
+    if (utf8Len == 0) {
         return *this;
     }
     auto oldLen = length_;
     length_ = utf8Len + oldLen;
-    if (Capacity() < length_)
-    {
+    if (Capacity() < length_) {
         ReAllocate(CalculateCapacity(length_));
     }
 
     uint32_t index = 0;
     auto readFn = [&index, utf8]() -> utf8::char_type { return (utf8::char_type)utf8[index++]; };
 
-    for (uint32_t i = 0; i < utf8Len; ++i)
-    {
+    for (uint32_t i = 0; i < utf8Len; ++i) {
         sequenceData_->chars_[i + oldLen] = utf8::read(readFn);
     }
     return *this;
 }
 
-String &String::operator=(const wchar_t *unicode)
+String& String::operator=(const wchar_t* unicode)
 {
     length_ = (uint32_t)wcslen(unicode);
-    if (Capacity() < length_)
-    {
+    if (Capacity() < length_) {
         ReAllocate(CalculateCapacity(length_));
     }
-    for (uint32_t i = 0; i < length_; ++i)
-    {
+    for (uint32_t i = 0; i < length_; ++i) {
         sequenceData_->chars_[i] = unicode[i];
     }
     return *this;
 }
 
-String &String::operator+=(const wchar_t unicode)
+String& String::operator+=(const wchar_t unicode)
 {
     auto oldLen = length_;
     ++length_;
-    if (Capacity() < length_)
-    {
+    if (Capacity() < length_) {
         ReAllocate(CalculateCapacity(length_));
     }
     sequenceData_->chars_[oldLen] = unicode;
     return *this;
 }
 
-String &String::operator+=(const char c)
+String& String::operator+=(const char c)
 {
     auto oldLen = length_;
     ++length_;
-    if (Capacity() < length_)
-    {
+    if (Capacity() < length_) {
         ReAllocate(CalculateCapacity(length_));
     }
     sequenceData_->chars_[oldLen] = c;
     return *this;
 }
 
-String &String::operator+=(const wchar_t *unicode)
+String& String::operator+=(const wchar_t* unicode)
 {
     auto len = (uint32_t)wcslen(unicode);
-    if (len == 0)
-    {
+    if (len == 0) {
         return *this;
     }
     auto oldLen = length_;
     length_ = len + oldLen;
-    if (Capacity() < length_)
-    {
+    if (Capacity() < length_) {
         ReAllocate(CalculateCapacity(length_));
     }
-    for (uint32_t i = 0; i < len; ++i)
-    {
+    for (uint32_t i = 0; i < len; ++i) {
         sequenceData_->chars_[i + oldLen] = unicode[i];
     }
     return *this;
@@ -951,16 +917,14 @@ String &String::operator+=(const wchar_t *unicode)
 
 void String::Reserve(uint32_t n)
 {
-    if (Capacity() < n)
-    {
+    if (Capacity() < n) {
         ReAllocate(CalculateCapacity(n));
     }
 }
 
 void String::Resize(uint32_t n)
 {
-    if (Capacity() < n)
-    {
+    if (Capacity() < n) {
         ReAllocate(CalculateCapacity(n));
     }
     length_ = n;
@@ -968,10 +932,8 @@ void String::Resize(uint32_t n)
 
 void String::TrimLeading()
 {
-    for (uint32_t i = 0; i < Length(); ++i)
-    {
-        if (!IsWhiteSpace(At(i)))
-        {
+    for (uint32_t i = 0; i < Length(); ++i) {
+        if (!IsWhiteSpace(At(i))) {
             length_ -= i;
             memmove(sequenceData_->chars_, sequenceData_->chars_ + i, Length() * sizeof(CharType));
             return;
@@ -982,10 +944,8 @@ void String::TrimLeading()
 
 void String::TrimTrailing()
 {
-    for (uint32_t i = Length(); i > 0; --i)
-    {
-        if (!IsWhiteSpace(At(i - 1)))
-        {
+    for (uint32_t i = Length(); i > 0; --i) {
+        if (!IsWhiteSpace(At(i - 1))) {
             length_ = i;
             return;
         }
@@ -996,12 +956,9 @@ void String::TrimTrailing()
 void String::ReAllocate(uint32_t newCapacity)
 {
     capacity_ = newCapacity;
-    if (sequenceData_ == nullptr)
-    {
+    if (sequenceData_ == nullptr) {
         sequenceData_ = new SequenceData(capacity_);
-    }
-    else
-    {
+    } else {
         sequenceData_->ReAllocate(capacity_);
     }
 }
@@ -1014,7 +971,7 @@ void String::Free()
     capacity_ = 0;
 }
 
-std::ostream &operator<<(std::ostream &os, const CharSequence &s)
+std::ostream& operator<<(std::ostream& os, const CharSequence& s)
 {
     os << s.ToStdString(CharSequence::kUtf8);
     return os;

@@ -10,14 +10,12 @@
 #include <sstream>
 #include <string>
 
-namespace TestRefCount
-{
+namespace TestRefCount {
 
 std::stringstream gOutput;
-class Base : public ss::RefCounted
-{
+class Base : public ss::RefCounted {
 public:
-    Base(const std::string &name)
+    Base(const std::string& name)
     {
         name_ = name;
         gOutput << "Construct base of " << name << std::endl;
@@ -30,10 +28,10 @@ public:
     std::string name_;
 };
 
-class Child : public Base
-{
+class Child : public Base {
 public:
-    Child(const std::string &name) : Base(name)
+    Child(const std::string& name)
+        : Base(name)
     {
         gOutput << "Construct child of " << name << std::endl;
     }
@@ -43,8 +41,7 @@ public:
     }
 };
 
-class D : public ss::RefCounted
-{
+class D : public ss::RefCounted {
 };
 
 void test_refcounter()

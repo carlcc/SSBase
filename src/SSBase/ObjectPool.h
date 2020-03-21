@@ -6,11 +6,9 @@
 #include <mutex>
 #include <queue>
 
-namespace ss
-{
+namespace ss {
 
-class SingleThreadPolicy
-{
+class SingleThreadPolicy {
 public:
     static void Lock()
     {
@@ -21,10 +19,9 @@ public:
     }
 };
 
-class MultiThreadPolicy
-{
+class MultiThreadPolicy {
 public:
-    static std::mutex &GetMutex()
+    static std::mutex& GetMutex()
     {
         static std::mutex mutex;
         return mutex;
@@ -41,40 +38,36 @@ public:
     }
 };
 
-template <class T, class ThreadPolicy = SingleThreadPolicy> class ObjectPool
-{
+template <class T, class ThreadPolicy = SingleThreadPolicy>
+class ObjectPool {
 public:
-    explicit ObjectPool(size_t capacity) : cap_(capacity), queue_()
+    explicit ObjectPool(size_t capacity)
+        : cap_(capacity)
+        , queue_()
     {
     }
 
-    T *Get()
+    T* Get()
     {
         ThreadPolicy::Lock();
-        if (queue_.size() == 0)
-        {
+        if (queue_.size() == 0) {
             ThreadPolicy::Unlock();
             return new T;
-        }
-        else
-        {
-            T *t = queue_.front();
+        } else {
+            T* t = queue_.front();
             queue_.pop();
             ThreadPolicy::Unlock();
             return t;
         }
     }
 
-    void Put(T *t)
+    void Put(T* t)
     {
         ThreadPolicy::Lock();
-        if (queue_.size() >= cap_)
-        {
+        if (queue_.size() >= cap_) {
             ThreadPolicy::Unlock();
             delete t;
-        }
-        else
-        {
+        } else {
             queue_.push(t);
             ThreadPolicy::Unlock();
         }

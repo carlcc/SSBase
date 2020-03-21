@@ -9,12 +9,10 @@
 #include <SSBase/Str.h>
 #include <sstream>
 
-namespace TestReflection
-{
+namespace TestReflection {
 
 std::stringstream gOutput;
-class Child : public ss::Object
-{
+class Child : public ss::Object {
     SS_OBJECT(Child, ss::Object)
 
 protected:
@@ -37,11 +35,10 @@ public:
     }
 
 private:
-    bool isEnabled_{false};
+    bool isEnabled_ { false };
 };
 
-class Child2 : public Child
-{
+class Child2 : public Child {
     SS_OBJECT(Child2, Child)
 protected:
     static ss::PropertyMap RegisterProperties()
@@ -66,25 +63,23 @@ public:
     }
 
     ss::String name_;
-    const ss::String &GetName() const
+    const ss::String& GetName() const
     {
         return name_;
     }
-    void SetName(const ss::String &name)
+    void SetName(const ss::String& name)
     {
         name_ = name;
     }
 };
 
-class Child3 : public ss::Object
-{
+class Child3 : public ss::Object {
     SS_OBJECT(Child3, ss::Object)
 
 public:
 };
 
-class Child4 : public ss::Object
-{
+class Child4 : public ss::Object {
     SS_OBJECT(Child4, ss::Object)
 
 public:
@@ -103,8 +98,8 @@ bool test()
     Child c;
 
     {
-        auto &props = Child::GetAllPropertiesStatic();
-        auto &prop = props.at("IsEnabled");
+        auto& props = Child::GetAllPropertiesStatic();
+        auto& prop = props.at("IsEnabled");
         ss::Variant v;
         c.SetIsEnabled(false);
         prop.GetAccessor()->Get(&c, v);
@@ -123,8 +118,8 @@ bool test()
     Child2 c2;
     {
         // inherit from Child
-        auto &props = Child2::GetAllPropertiesStatic();
-        auto &prop = props.at("IsEnabled");
+        auto& props = Child2::GetAllPropertiesStatic();
+        auto& prop = props.at("IsEnabled");
         ss::Variant v;
         c2.SetIsEnabled(false);
         prop.GetAccessor()->Get(&c2, v);
@@ -142,8 +137,8 @@ bool test()
     }
     {
         // new property
-        auto &props = Child2::GetAllPropertiesStatic();
-        auto &prop = props.at("IsVisible");
+        auto& props = Child2::GetAllPropertiesStatic();
+        auto& prop = props.at("IsVisible");
         ss::Variant v;
         c2.SetIsVisible(false);
         prop.GetAccessor()->Get(&c2, v);
@@ -161,8 +156,8 @@ bool test()
     }
     {
         // new property
-        auto &props = Child2::GetAllPropertiesStatic();
-        auto &prop = props.at("Name");
+        auto& props = Child2::GetAllPropertiesStatic();
+        auto& prop = props.at("Name");
         ss::Variant v;
         ss::String name = "hello, world";
         c2.SetName(name);
@@ -188,7 +183,7 @@ bool test()
     SSASSERT(c3.IsInstanceOf<Child3>());
     SSASSERT(c3.IsInstanceOf<ss::Object>());
 
-    ss::Object *obj = &c3;
+    ss::Object* obj = &c3;
     SSASSERT(ss::Object::DynamicCast<Child>(obj) == nullptr);
     SSASSERT(ss::Object::DynamicCast<Child3>(obj) == &c3);
 

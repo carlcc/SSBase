@@ -6,18 +6,16 @@
 
 #include "InputStream.h"
 
-namespace ss
-{
+namespace ss {
 
-class Lz4InputStream : public InputStream
-{
+class Lz4InputStream : public InputStream {
     SS_OBJECT(Lz4InputStream, InputStream);
 
 public:
-    explicit Lz4InputStream(InputStream *stream);
+    explicit Lz4InputStream(InputStream* stream);
     ~Lz4InputStream() override;
     int Read() override;
-    int32_t Read(void *buf, uint32_t count) override;
+    int32_t Read(void* buf, uint32_t count) override;
     int64_t Skip(int64_t n) override;
     int32_t Available() const override;
     void Close() override;
@@ -25,7 +23,7 @@ public:
 
 private:
     class Impl;
-    Impl *impl_;
+    Impl* impl_;
 };
 
 }

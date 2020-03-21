@@ -7,11 +7,9 @@
 #include "RefCounted.h"
 #include <cstdint>
 
-namespace ss
-{
+namespace ss {
 
-class Color
-{
+class Color {
 public:
 private:
     union {

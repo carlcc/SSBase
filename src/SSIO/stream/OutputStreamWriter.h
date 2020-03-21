@@ -6,23 +6,23 @@
 
 #include "OutputStream.h"
 
-namespace ss
-{
+namespace ss {
 
-class OutputStreamWriter : public Object
-{
+class OutputStreamWriter : public Object {
     SS_OBJECT(OutputStreamWriter, Object);
 
 public:
-    explicit OutputStreamWriter(OutputStream *stream) : stream_(*stream)
+    explicit OutputStreamWriter(OutputStream* stream)
+        : stream_(*stream)
     {
         SSASSERT(stream != nullptr);
     }
-    explicit OutputStreamWriter(OutputStream &stream) : stream_(stream)
+    explicit OutputStreamWriter(OutputStream& stream)
+        : stream_(stream)
     {
     }
 
-    int32_t Write(void *buf, uint32_t count)
+    int32_t Write(void* buf, uint32_t count)
     {
         return stream_.Write(buf, count);
     }
@@ -147,7 +147,7 @@ public:
     }
 
 private:
-    OutputStream &stream_;
+    OutputStream& stream_;
 };
 
 }

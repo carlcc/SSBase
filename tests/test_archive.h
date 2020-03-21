@@ -5,22 +5,20 @@
 #pragma once
 
 #include <SSIO/Archive.h>
+#include <SSIO/file/FileSystem.h>
 #include <SSIO/stream/BufferedInputStream.h>
 #include <SSIO/stream/InputStream.h>
 #include <SSIO/stream/StreamConstant.h>
-#include <SSIO/file/FileSystem.h>
 
-namespace TestArchive
-{
+namespace TestArchive {
 bool test()
 {
     using namespace ss;
     String path = FileSystem::GetParent(__FILE__);
     Archive archive(path + "/a.zip");
 
-    auto &entries = archive.GetEntries();
-    for (auto &e : entries)
-    {
+    auto& entries = archive.GetEntries();
+    for (auto& e : entries) {
         std::cout << "== " << e << std::endl;
     }
     auto ais = archive.GetInputStream("include/zipconf.h");
@@ -28,15 +26,12 @@ bool test()
     std::cout << "== " << is->IsValid() << std::endl;
     char buf[256];
     std::string result;
-    while (true)
-    {
+    while (true) {
         auto ret = is->Read(buf, 256);
-        if (ret == StreamConstant::ErrorCode::kEof)
-        {
+        if (ret == StreamConstant::ErrorCode::kEof) {
             break;
         }
-        if (ret == StreamConstant::ErrorCode::kUnknown)
-        {
+        if (ret == StreamConstant::ErrorCode::kUnknown) {
             SSASSERT(false);
         }
 

@@ -6,15 +6,12 @@
 
 #include "InputStream.h"
 
-namespace ss
-{
+namespace ss {
 
-class SeekableInputStream : public InputStream
-{
+class SeekableInputStream : public InputStream {
     SS_OBJECT(SeekableInputStream, InputStream)
 public:
-    enum Whence
-    {
+    enum Whence {
         kSeekCur,
         kSeekSet,
         kSeekEnd

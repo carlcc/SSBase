@@ -10,23 +10,19 @@
 #include <SSIO/stream/FileInputStream.h>
 #include <SSIO/stream/FileOutputStream.h>
 
-namespace TestStream
-{
+namespace TestStream {
 
-bool test(int argc, char **argv)
+bool test(int argc, char** argv)
 {
     using namespace ss;
     SharedPtr<InputStream> fis1 = MakeShared<FileInputStream>(argv[0]);
-    SharedPtr<OutputStream> fos1 =
-        MakeShared<FileOutputStream>(argv[0] + String(".copy"));
+    SharedPtr<OutputStream> fos1 = MakeShared<FileOutputStream>(argv[0] + String(".copy"));
 
     auto fis = MakeShared<BufferedInputStream>(fis1);
     auto fos = MakeShared<BufferedOutputStream>(fos1);
     char buffer[4096];
-    if (fis->IsValid() && fos->IsValid())
-    {
-        while (fis->Available() > 0)
-        {
+    if (fis->IsValid() && fos->IsValid()) {
+        while (fis->Available() > 0) {
             auto c = fis->Read(buffer, sizeof(buffer));
             fos->Write(buffer, c);
         }

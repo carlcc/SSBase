@@ -8,13 +8,11 @@
 #include <SSBase/Ptr.h>
 #include <sstream>
 
-namespace TestVariant
-{
+namespace TestVariant {
 
 std::stringstream gOutput;
 
-class A : public ss::RefCounted
-{
+class A : public ss::RefCounted {
 public:
     A()
     {

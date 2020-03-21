@@ -8,20 +8,18 @@
 #include "Property.h"
 #include "Str.h"
 
-namespace ss
-{
+namespace ss {
 
 using PropertyMap = std::map<String, Property>;
 
-struct RuntimeTypeInfo
-{
-    const String &name;
-    const RuntimeTypeInfo *parent;
-    const PropertyMap &(*GetAllProperties)();
+struct RuntimeTypeInfo {
+    const String& name;
+    const RuntimeTypeInfo* parent;
+    const PropertyMap& (*GetAllProperties)();
 };
 
-template <class T> struct RuntimeTypeInfoImpl : public RuntimeTypeInfo
-{
+template <class T>
+struct RuntimeTypeInfoImpl : public RuntimeTypeInfo {
 };
 
 } // namespace ss

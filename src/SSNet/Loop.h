@@ -7,23 +7,21 @@
 #include <SSBase/Object.h>
 #include <SSBase/Ptr.h>
 
-namespace ss
-{
+namespace ss {
 
 class AsyncTcpSocket;
 
-class Loop : public Object
-{
+class Loop : public Object {
     SS_OBJECT(Loop, Object);
 
 public:
     Loop();
-    Loop(const Loop &l) = delete;
-    Loop(Loop &&l) = delete;
+    Loop(const Loop& l) = delete;
+    Loop(Loop&& l) = delete;
     ~Loop() override;
 
-    Loop &operator=(const Loop &l) = delete;
-    Loop &operator=(Loop &&l) = delete;
+    Loop& operator=(const Loop& l) = delete;
+    Loop& operator=(Loop&& l) = delete;
 
     int Run();
 
@@ -34,7 +32,7 @@ public:
 
 private:
     class LoopImpl;
-    LoopImpl *impl_;
+    LoopImpl* impl_;
 };
 
 } // namespace ss

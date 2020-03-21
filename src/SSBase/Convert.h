@@ -8,13 +8,12 @@
 #include <sstream>
 #include <string>
 
-namespace ss
-{
+namespace ss {
 
-class Convert
-{
+class Convert {
 public:
-    template <class T> static T StringTo(const String &s)
+    template <class T>
+    static T StringTo(const String& s)
     {
         std::stringstream ss;
         ss << s;
@@ -23,7 +22,8 @@ public:
         return t;
     }
 
-    template <class T> static T StringTo(const char *s)
+    template <class T>
+    static T StringTo(const char* s)
     {
         std::stringstream ss;
         ss << s;
@@ -32,7 +32,8 @@ public:
         return t;
     }
 
-    template <class T> static T StringTo(const std::string &s)
+    template <class T>
+    static T StringTo(const std::string& s)
     {
         std::stringstream ss;
         ss << s;
@@ -41,7 +42,8 @@ public:
         return t;
     }
 
-    template <class T> static T StringTo(const std::wstring &s)
+    template <class T>
+    static T StringTo(const std::wstring& s)
     {
         std::wstringstream ss;
         ss << s;
@@ -50,7 +52,8 @@ public:
         return t;
     }
 
-    template <class T> static T StringTo(const wchar_t *s)
+    template <class T>
+    static T StringTo(const wchar_t* s)
     {
         std::wstringstream ss;
         ss << s;

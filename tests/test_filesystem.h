@@ -1,7 +1,6 @@
 #include <SSIO/file/FileSystem.h>
 
-namespace TestFileSystem
-{
+namespace TestFileSystem {
 
 void test_relative_path()
 {

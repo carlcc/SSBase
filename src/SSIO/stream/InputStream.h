@@ -7,19 +7,17 @@
 #include "../../SSBase/Object.h"
 #include <cstdint>
 
-namespace ss
-{
+namespace ss {
 
-class InputStream : public Object
-{
+class InputStream : public Object {
     SS_OBJECT(InputStream, Object);
 
 public:
     InputStream() = default;
-    InputStream(const InputStream &) = delete;
-    InputStream(InputStream &&) = delete;
-    InputStream &operator=(const InputStream &) = delete;
-    InputStream &operator=(InputStream &&) = delete;
+    InputStream(const InputStream&) = delete;
+    InputStream(InputStream&&) = delete;
+    InputStream& operator=(const InputStream&) = delete;
+    InputStream& operator=(InputStream&&) = delete;
     ~InputStream() override = default;
 
     /// Read 1 byte, returns the byte, returns -1 on EOF reached, else return the error code
@@ -28,7 +26,7 @@ public:
     /// Read at most `count` bytes, returns the actual read bytes number, returns -1 if EOF
     /// Reached, else return the error code.
     /// NOTE: Invoke Read() function by default, you'd better override it for better performance.
-    virtual int32_t Read(void *buf, uint32_t count);
+    virtual int32_t Read(void* buf, uint32_t count);
 
     /// Skip 'n' bytes from stream, returns the actual skipped bytes number.
     /// NOTE: Invoke Read(void*, uint32_t) byte default, you may need to override it for better performance.

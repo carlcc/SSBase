@@ -7,8 +7,7 @@
 #include <SSBase/Assert.h>
 #include <SSBase/Str.h>
 
-namespace TestString
-{
+namespace TestString {
 
 bool test()
 {
@@ -119,10 +118,9 @@ bool test()
         strToSplit = "Hello,,world,,nice,,世界，!";
         std::set<String> strset = strToSplit.Split(",,");
         SSASSERT(strset.size() == 4);
-        String result[4] = {"Hello", "nice", "world", "世界，!"};
+        String result[4] = { "Hello", "nice", "world", "世界，!" };
         uint32_t i = 0;
-        for (auto &s : strset)
-        {
+        for (auto& s : strset) {
             SSASSERT(s == result[i++]);
         }
 

@@ -1,7 +1,6 @@
 //
 // Copyright (c) 2020 Carl Chen. All rights reserved.
 //
-#include <iostream>
 #include "test_archive.h"
 #include "test_filesystem.h"
 #include "test_net.h"
@@ -11,8 +10,9 @@
 #include "test_string.h"
 #include "test_variant.h"
 #include "testrefcounter.h"
+#include <iostream>
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     TestString::test();
 

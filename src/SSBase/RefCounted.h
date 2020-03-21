@@ -6,18 +6,17 @@
 
 #include "Assert.h"
 
-namespace ss
-{
+namespace ss {
 
-template <class T> class SharedPtr;
-template <class T> class WeakPtr;
+template <class T>
+class SharedPtr;
+template <class T>
+class WeakPtr;
 
-class RefCounted
-{
+class RefCounted {
 private:
-    struct RefCounter
-    {
-        RefCounted *object;
+    struct RefCounter {
+        RefCounted* object;
         int sharedCount;
         int weakCount;
 
@@ -30,8 +29,7 @@ private:
         void DecreaseShared()
         {
             SSASSERT(sharedCount > 0);
-            if (--sharedCount == 0)
-            {
+            if (--sharedCount == 0) {
                 delete object;
             }
         }
@@ -45,8 +43,7 @@ private:
         void DecreaseWeak()
         {
             SSASSERT(weakCount > 0);
-            if (--weakCount == 0)
-            {
+            if (--weakCount == 0) {
                 delete this;
             }
         }
@@ -58,7 +55,8 @@ private:
     };
 
 public:
-    RefCounted() : refCounter_(new RefCounter)
+    RefCounted()
+        : refCounter_(new RefCounter)
     {
         refCounter_->object = this;
         refCounter_->sharedCount = 0;
@@ -73,10 +71,12 @@ public:
     }
 
 private:
-    RefCounter *refCounter_;
+    RefCounter* refCounter_;
 
-    template <class T> friend class SharedPtr;
-    template <class T> friend class WeakPtr;
+    template <class T>
+    friend class SharedPtr;
+    template <class T>
+    friend class WeakPtr;
 };
 
 }

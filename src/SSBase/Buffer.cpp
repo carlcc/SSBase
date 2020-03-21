@@ -5,13 +5,15 @@
 #include "Buffer.h"
 #include "../SSBase/Misc.h"
 
-namespace ss
-{
+namespace ss {
 
-DynamicBuffer::DynamicBuffer(uint32_t capacity) : offset_(0), size_(0), capacity_(0), buf_(nullptr)
+DynamicBuffer::DynamicBuffer(uint32_t capacity)
+    : offset_(0)
+    , size_(0)
+    , capacity_(0)
+    , buf_(nullptr)
 {
-    if (capacity > 0)
-    {
+    if (capacity > 0) {
         ReAllocate(Misc::CeilToPowerOfTwo(capacity));
     }
 }
@@ -21,23 +23,21 @@ DynamicBuffer::~DynamicBuffer()
     offset_ = 0;
     size_ = 0;
     capacity_ = 0;
-    if (buf_ != nullptr)
-    {
+    if (buf_ != nullptr) {
         free(buf_);
         buf_ = nullptr;
     }
 }
-uint32_t DynamicBuffer::ReadData(void *buffer, uint32_t size) const
+uint32_t DynamicBuffer::ReadData(void* buffer, uint32_t size) const
 {
-    if (size > Size())
-    {
+    if (size > Size()) {
         size = Size();
     }
     memcpy(buffer, GetData<void>(), size);
     return size;
 }
 
-void DynamicBuffer::PushData(const void *data, uint32_t length)
+void DynamicBuffer::PushData(const void* data, uint32_t length)
 {
     EnsureSpace(length);
     memcpy(GetData<uint8_t>() + Size(), data, length);
@@ -49,8 +49,7 @@ void DynamicBuffer::EnsureSpace(uint32_t size)
     if (Size() + size > Capacity()) // If we need larger buffer
     {
         uint32_t newCapacity = Capacity() * 2;
-        if (newCapacity < Size() + size)
-        {
+        if (newCapacity < Size() + size) {
             newCapacity = Misc::CeilToPowerOfTwo(size + Size());
         }
         ReAllocate(newCapacity);
@@ -69,13 +68,10 @@ void DynamicBuffer::EnsureSpace(uint32_t size)
 
 void DynamicBuffer::ReAllocate(uint32_t length)
 {
-    if (buf_ == nullptr)
-    {
-        buf_ = static_cast<uint8_t *>(malloc(length));
-    }
-    else
-    {
-        buf_ = static_cast<uint8_t *>(realloc(buf_, length));
+    if (buf_ == nullptr) {
+        buf_ = static_cast<uint8_t*>(malloc(length));
+    } else {
+        buf_ = static_cast<uint8_t*>(realloc(buf_, length));
     }
     capacity_ = length;
 }

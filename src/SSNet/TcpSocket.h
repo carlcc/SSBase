@@ -8,8 +8,7 @@
 #include "SocketDef.h"
 #include <cstdint>
 
-namespace ss
-{
+namespace ss {
 
 class EndPoint;
 
@@ -17,30 +16,29 @@ class InputStream;
 
 class OutputStream;
 
-class TcpSocket : public Object
-{
+class TcpSocket : public Object {
     SS_OBJECT(TcpSocket, Object);
 
 public:
     static SharedPtr<TcpSocket> CreateSocket(IpProtocolType type);
 
-    virtual int Connect(const EndPoint &ep) = 0;
+    virtual int Connect(const EndPoint& ep) = 0;
 
-    int Connect(const String &host, uint16_t port);
+    int Connect(const String& host, uint16_t port);
 
-    virtual int Bind(const EndPoint &ep) = 0;
+    virtual int Bind(const EndPoint& ep) = 0;
 
-    int Bind(const String &hostAndIp);
+    int Bind(const String& hostAndIp);
 
-    int Bind(const String &host, uint16_t port);
+    int Bind(const String& host, uint16_t port);
 
     virtual int Listen(int backlog) = 0;
 
     virtual SharedPtr<TcpSocket> Accept() = 0;
 
-    virtual int Send(const void *data, uint32_t length) = 0;
+    virtual int Send(const void* data, uint32_t length) = 0;
 
-    virtual int Receive(void *buf, uint32_t size) = 0;
+    virtual int Receive(void* buf, uint32_t size) = 0;
 
     virtual void Close() = 0;
 

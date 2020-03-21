@@ -4,16 +4,15 @@
 
 #pragma once
 
-namespace ss
-{
+namespace ss {
 
-template <class T> class Singleton
-{
+template <class T>
+class Singleton {
 private:
     Singleton() = delete;
 
 public:
-    T &Instance()
+    T& Instance()
     {
         static T t;
         return t;

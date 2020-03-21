@@ -8,23 +8,21 @@
 #include "StreamConstant.h"
 #include <cstdio>
 
-namespace ss
-{
+namespace ss {
 
-class FileInputStream : public SeekableInputStream
-{
+class FileInputStream : public SeekableInputStream {
     SS_OBJECT(FileInputStream, SeekableInputStream);
 
 public:
-    explicit FileInputStream(const CharSequence &file);
+    explicit FileInputStream(const CharSequence& file);
 
-    explicit FileInputStream(const String &file);
+    explicit FileInputStream(const String& file);
 
     ~FileInputStream() override;
 
     int Read() override;
 
-    int32_t Read(void *buf, uint32_t count) override;
+    int32_t Read(void* buf, uint32_t count) override;
 
     int64_t Skip(int64_t n) override;
 
@@ -39,10 +37,10 @@ public:
     int Seek(int64_t offset, Whence whence) override;
 
 private:
-    void Init(const CharSequence &file);
+    void Init(const CharSequence& file);
 
 private:
-    FILE *filePtr_;
+    FILE* filePtr_;
     int64_t totalFileSize_;
 };
 

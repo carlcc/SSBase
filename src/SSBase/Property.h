@@ -7,37 +7,37 @@
 #include "Ptr.h"
 #include "Variant.h"
 
-namespace ss
-{
+namespace ss {
 
 class Object;
 
-class PropertyAccessor : public RefCounted
-{
+class PropertyAccessor : public RefCounted {
 public:
-    virtual void Get(const Object *obj, Variant &dest) const = 0;
+    virtual void Get(const Object* obj, Variant& dest) const = 0;
 
-    virtual void Set(Object *obj, const Variant &src) = 0;
+    virtual void Set(Object* obj, const Variant& src) = 0;
 };
 
-template <class ClassType, class Getter, class Setter> class PropertyAccessorImpl : public PropertyAccessor
-{
+template <class ClassType, class Getter, class Setter>
+class PropertyAccessorImpl : public PropertyAccessor {
 public:
-    PropertyAccessorImpl(Getter getFunction, Setter setFunction) : getter_(getFunction), setter_(setFunction)
+    PropertyAccessorImpl(Getter getFunction, Setter setFunction)
+        : getter_(getFunction)
+        , setter_(setFunction)
     {
     }
 
-    void Get(const Object *ptr, Variant &value) const override
+    void Get(const Object* ptr, Variant& value) const override
     {
         SSASSERT(ptr != nullptr);
-        const auto classPtr = static_cast<const ClassType *>(ptr);
+        const auto classPtr = static_cast<const ClassType*>(ptr);
         getter_(*classPtr, value);
     }
 
-    void Set(Object *ptr, const Variant &value) override
+    void Set(Object* ptr, const Variant& value) override
     {
         SSASSERT(ptr);
-        auto classPtr = static_cast<ClassType *>(ptr);
+        auto classPtr = static_cast<ClassType*>(ptr);
         setter_(*classPtr, value);
     }
 
@@ -47,22 +47,23 @@ private:
 };
 
 template <class ClassType, class Getter, class Setter>
-class SharedPtr<PropertyAccessor> MakePropertyAccessor(Getter getFunction, Setter setFunction)
-{
+class SharedPtr<PropertyAccessor> MakePropertyAccessor(Getter getFunction, Setter setFunction) {
     return SharedPtr<PropertyAccessor>(new PropertyAccessorImpl<ClassType, Getter, Setter>(getFunction, setFunction));
 }
 
-class Property
-{
+class Property {
 public:
-    Property(const Property &) = default;
-    Property(Property &&) = default;
-    Property(String &&name, ss::Variant::Type type, ss::SharedPtr<ss::PropertyAccessor> accessor, int32_t flags)
-        : name_(std::forward<String>(name)), type(type), accessor_(std::move(accessor)), flags(flags)
+    Property(const Property&) = default;
+    Property(Property&&) = default;
+    Property(String&& name, ss::Variant::Type type, ss::SharedPtr<ss::PropertyAccessor> accessor, int32_t flags)
+        : name_(std::forward<String>(name))
+        , type(type)
+        , accessor_(std::move(accessor))
+        , flags(flags)
     {
     }
 
-    const String &GetName() const
+    const String& GetName() const
     {
         return name_;
     }
@@ -70,7 +71,7 @@ public:
     {
         return type;
     }
-    const SharedPtr<PropertyAccessor> &GetAccessor() const
+    const SharedPtr<PropertyAccessor>& GetAccessor() const
     {
         return accessor_;
     }
@@ -80,8 +81,7 @@ public:
     }
 
 private:
-    enum Flag
-    {
+    enum Flag {
         kFlagNone = 0,
     };
     String name_;
