@@ -52,7 +52,7 @@ public:
 
     void PushData(const void* data, uint32_t length)
     {
-        SSASERT(length <= Capacity() - Size());
+        SSASSERT(length <= Capacity() - Size());
         EnsureSpace(length);
         memcpy(GetData<uint8_t>() + Size(), data, length);
         size_ += length;
