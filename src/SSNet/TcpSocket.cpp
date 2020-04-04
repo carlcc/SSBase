@@ -42,7 +42,8 @@ SharedPtr<TcpSocket> TcpSocket::CreateSocket(IpProtocolType type)
     if (type == IpProtocolType::SS_IPV6) {
         // Disable V6ONLY option for IPv6, ignore the return code
 #ifdef SS_PLATFORM_WIN32
-#error NYI
+        int v6only = 0;
+        setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&v6only, sizeof(v6only));
 #else
         int v6only = 0;
         setsockopt(fd, IPPROTO_IPV6, IPV6_V6ONLY, &v6only, sizeof(v6only));

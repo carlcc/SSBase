@@ -115,7 +115,7 @@ public:
     {
 
 #ifdef SS_PLATFORM_WIN32
-        int avalable = 0;
+        u_long avalable = 0;
         if (0 == ioctlsocket(sockFd_, FIONREAD, &avalable))
 #else
         u_long avalable = 0;

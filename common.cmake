@@ -8,12 +8,9 @@ set(SSBASE_LIBRARY_FIND_PATH
         /usr/lib
         )
 set(SSBASE_PATH_FIND_PATH
-        ${CMAKE_CURRENT_LIST_DIR}/thirdparty/lib64
-        ${CMAKE_CURRENT_LIST_DIR}/thirdparty/lib
-        /usr/local/lib64
-        /usr/local/lib
-        /usr/lib64
-        /usr/lib
+        ${CMAKE_CURRENT_LIST_DIR}/thirdparty/include
+        /usr/local/include
+        /usr/include
         )
 
 function(SSBaseFindLibrary output libName isRequired)
