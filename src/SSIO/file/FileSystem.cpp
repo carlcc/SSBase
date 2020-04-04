@@ -7,6 +7,9 @@
 #include <Windows.h>
 #include <direct.h>
 #include <io.h>
+#ifdef __GNUC__
+#include <sys/stat.h>
+#endif
 #elif defined(SS_PLATFORM_UNIX)
 #include <dirent.h>
 #include <sys/stat.h>
