@@ -38,6 +38,7 @@ function(SSBaseFindLibrary output libName isRequired)
     find_library(${output}
             NAMES ${PLATFORM_LIB_NAME}
             PATHS ${SSBASE_LIBRARY_FIND_PATH}
+            NO_DEFAULT_PATH
             )
     if (${output})
         message("Found ${libName}: ${${output}}")
@@ -54,6 +55,7 @@ function(SSBaseFindPath output fileName isRequired)
     find_path(${output}
             NAMES ${fileName}
             PATHS ${SSBASE_PATH_FIND_PATH}
+            NO_DEFAULT_PATH
             )
     if (${output})
         message("Found ${fileName} under: ${${output}}")
