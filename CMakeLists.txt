@@ -4,6 +4,8 @@ project(SSBase)
 
 set(CMAKE_CXX_STANDARD 14)
 
+option(SSBASE_BUILD_TEST "Build the test program" OFF)
+
 include(common.cmake)
 
 SSBaseFindLibrary(UV_LIB "uv" True)
@@ -43,14 +45,6 @@ add_subdirectory(src/SSBase)
 add_subdirectory(src/SSIO)
 add_subdirectory(src/SSNet)
 
-add_executable(testmain tests/testmain.cpp)
-add_dependencies(testmain SSBase SSIO)
-
-if (WIN32)
-    set(SSBASE_PLATFORM_LIBS ws2_32)
-else ()
-    set(SSBASE_PLATFORM_LIBS pthread)
-endif ()
-link_directories(${CMAKE_CURRENT_LIST_DIR}/thirdparty/lib)
-target_link_libraries(testmain SSBase SSIO SSNet ${UV_LIB} ${ZIP_LIB} ${Z_LIB} ${SSBASE_PLATFORM_LIBS})
-target_include_directories(testmain PRIVATE src ${UV_INCLUDE} ${ZIP_INCLUDE})
+if (SSBASE_BUILD_TEST)
+    add_subdirectory(tests)
+endif()

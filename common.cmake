@@ -1,17 +1,26 @@
 
-set(SSBASE_LIBRARY_FIND_PATH
-        ${CMAKE_CURRENT_LIST_DIR}/thirdparty/lib64
-        ${CMAKE_CURRENT_LIST_DIR}/thirdparty/lib
-        /usr/local/lib64
-        /usr/local/lib
-        /usr/lib64
-        /usr/lib
-        )
-set(SSBASE_PATH_FIND_PATH
-        ${CMAKE_CURRENT_LIST_DIR}/thirdparty/include
-        /usr/local/include
-        /usr/include
-        )
+set(SSBASE_LIBRARY_FIND_PATH "" CACHE STRING "Where to find the required libraries")
+if (NOT SSBASE_LIBRARY_FIND_PATH)
+    set(SSBASE_LIBRARY_FIND_PATH
+            ${CMAKE_CURRENT_LIST_DIR}/thirdparty/lib64
+            ${CMAKE_CURRENT_LIST_DIR}/thirdparty/lib
+            /usr/local/lib64
+            /usr/local/lib
+            /usr/lib64
+            /usr/lib
+            )
+    message("SSBASE_LIBRARY_FIND_PATH is not set, use default: ${SSBASE_LIBRARY_FIND_PATH}")
+endif()
+
+set(SSBASE_PATH_FIND_PATH "" CACHE STRING "Where to find the required header files")
+if (NOT SSBASE_PATH_FIND_PATH)
+    set(SSBASE_PATH_FIND_PATH
+            ${CMAKE_CURRENT_LIST_DIR}/thirdparty/include
+            /usr/local/include
+            /usr/include
+            )
+    message("SSBASE_PATH_FIND_PATH is not set, use default: ${SSBASE_PATH_FIND_PATH}")
+endif()
 
 function(SSBaseFindLibrary output libName isRequired)
 
