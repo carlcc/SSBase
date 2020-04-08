@@ -169,6 +169,14 @@ public:
         return setsockopt(sockFd_, IPPROTO_TCP, TCP_NODELAY, (const char*)&flag, sizeof(flag));
     }
 
+    int SetLinger(bool b, int delaySeconds) override
+    {
+        linger l {};
+        l.l_onoff = b ? 1 : 0;
+        l.l_onoff = delaySeconds;
+        return setsockopt(sockFd_, SOL_SOCKET, SO_LINGER, &l, sizeof(linger));
+    }
+
 private:
     SOCKET sockFd_;
 };

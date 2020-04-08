@@ -65,6 +65,8 @@ public:
     virtual int SetReceiveTimeout(int millis) = 0;
 
     virtual int SetNoDelay(bool b) = 0;
+
+    virtual int SetLinger(bool b, int delaySeconds) = 0;
 };
 
 } // namespace ss
