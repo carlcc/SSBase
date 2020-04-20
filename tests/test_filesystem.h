@@ -1,3 +1,4 @@
+#include <SSIO/file/File.h>
 #include <SSIO/file/FileSystem.h>
 
 namespace TestFileSystem {
@@ -134,6 +135,87 @@ void test_file_related()
     }
 }
 
+void test_file_class()
+{
+    using namespace ss;
+
+    {
+        File f;
+        SSASSERT(f.GetPath() == f.GetAbsolutePath());
+        SSASSERT(f.GetPath() == FileSystem::GetCWD(true));
+    }
+
+    {
+        // Relative file
+        File f("./././a/b.txt");
+        SSASSERT(!f.IsAbsoluteFile());
+        SSASSERT(f.GetPath() == "a/b.txt");
+        SSASSERT(f.GetAbsolutePath() == FileSystem::MakePath(FileSystem::GetCWD(), "/a/b.txt", true));
+        SSASSERT(f.GetParent().GetPath() == "a");
+
+        File f1("a/b/c/d/e");
+        File f2("a/b/f/g");
+        {
+            String path1RelativeTo2 = f1.GetRelativePath(f2);
+            String path2RelativeTo1 = f2.GetRelativePath(f1);
+            SSASSERT(path1RelativeTo2 == "../../c/d/e");
+            SSASSERT(path2RelativeTo1 == "../../../f/g");
+        }
+        {
+            File f3 = f2; // NOLINT(performance-unnecessary-copy-initialization)
+            String path1RelativeTo3 = f1.GetRelativePath(f3);
+            String path3RelativeTo1 = f3.GetRelativePath(f1);
+            SSASSERT(path1RelativeTo3 == "../../c/d/e");
+            SSASSERT(path3RelativeTo1 == "../../../f/g");
+        }
+        {
+            File f3("a/b/", "f/g");
+            String path1RelativeTo3 = f1.GetRelativePath(f3);
+            String path3RelativeTo1 = f3.GetRelativePath(f1);
+            SSASSERT(path1RelativeTo3 == "../../c/d/e");
+            SSASSERT(path3RelativeTo1 == "../../../f/g");
+        }
+    }
+
+#ifdef SS_PLATFORM_WIN32
+#define SS_TEST_FILE_ABSOLUTE_PREFIX "C:"
+#else
+#define SS_TEST_FILE_ABSOLUTE_PREFIX 
+#endif
+    {
+        // Relative file
+        File f(SS_TEST_FILE_ABSOLUTE_PREFIX "/data/a/b.txt");
+        SSASSERT(f.IsAbsoluteFile());
+        SSASSERT(f.GetPath() == SS_TEST_FILE_ABSOLUTE_PREFIX "/data/a/b.txt");
+        SSASSERT(f.GetAbsolutePath() == SS_TEST_FILE_ABSOLUTE_PREFIX "/data/a/b.txt");
+        SSASSERT(f.GetParent().GetPath() == SS_TEST_FILE_ABSOLUTE_PREFIX "/data/a");
+
+        File f1(SS_TEST_FILE_ABSOLUTE_PREFIX "/data/a/b/c/d/e");
+        File f2(SS_TEST_FILE_ABSOLUTE_PREFIX "/data/a/b/f/g");
+        {
+            String path1RelativeTo2 = f1.GetRelativePath(f2);
+            String path2RelativeTo1 = f2.GetRelativePath(f1);
+            SSASSERT(path1RelativeTo2 == "../../c/d/e");
+            SSASSERT(path2RelativeTo1 == "../../../f/g");
+        }
+        {
+            File f3 = f2; // NOLINT(performance-unnecessary-copy-initialization)
+            String path1RelativeTo3 = f1.GetRelativePath(f3);
+            String path3RelativeTo1 = f3.GetRelativePath(f1);
+            SSASSERT(path1RelativeTo3 == "../../c/d/e");
+            SSASSERT(path3RelativeTo1 == "../../../f/g");
+        }
+        {
+            File f3(SS_TEST_FILE_ABSOLUTE_PREFIX "/data/a/b/", "f/g");
+            String path1RelativeTo3 = f1.GetRelativePath(f3);
+            String path3RelativeTo1 = f3.GetRelativePath(f1);
+            SSASSERT(path1RelativeTo3 == "../../c/d/e");
+            SSASSERT(path3RelativeTo1 == "../../../f/g");
+        }
+    }
+#undef SS_TEST_FILE_ABSOLUTE_PREFIX
+}
+
 bool test()
 {
     using namespace ss;
@@ -187,6 +269,8 @@ bool test()
     test_relative_path();
 
     test_file_related();
+
+    test_file_class();
 
     return true;
 }

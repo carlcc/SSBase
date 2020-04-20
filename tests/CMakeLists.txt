@@ -7,9 +7,9 @@ add_dependencies(ssbase_test SSBase SSIO SSNet)
 
 if (WIN32)
     set(SSBASE_PLATFORM_LIBS ws2_32)
-else ()
+else()
     set(SSBASE_PLATFORM_LIBS pthread)
-endif ()
+endif()
 target_link_libraries(ssbase_test SSBase SSIO SSNet ${UV_LIB} ${ZIP_LIB} ${Z_LIB} ${SSBASE_PLATFORM_LIBS})
 target_include_directories(ssbase_test PRIVATE ../src ${UV_INCLUDE} ${ZIP_INCLUDE})
 
