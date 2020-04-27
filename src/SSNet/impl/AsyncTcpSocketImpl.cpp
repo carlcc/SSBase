@@ -108,8 +108,15 @@ int AsyncTcpSocketImpl::Send(const void* data, uint32_t length, OnSendCb&& cb)
 
 static void UvAllocCb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 {
-    buf->base = new char[4096];
-    buf->len = 4096;
+    auto* selfData = (AsyncTcpSocketImpl::Data*)handle->data;
+    if (selfData->bufferUsed_) {
+        buf->base = nullptr;
+        buf->len = 0;
+        return;
+    }
+    buf->base = reinterpret_cast<char*>(selfData->buffer_);
+    buf->len = selfData->bufferSize_;
+    selfData->bufferUsed_ = true;
 }
 
 int AsyncTcpSocketImpl::StartReceive(OnDataCb&& cb)
@@ -123,7 +130,7 @@ int AsyncTcpSocketImpl::StartReceive(OnDataCb&& cb)
     return uv_read_start((uv_stream_s*)data_, UvAllocCb, [](uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
         auto* data = (Data*)stream->data;
         data->onDataCb_(nread, buf->base);
-        delete buf->base;
+        data->bufferUsed_ = false;
     });
 }
 

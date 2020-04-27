@@ -125,7 +125,15 @@ class DynamicBuffer {
 public:
     explicit DynamicBuffer(uint32_t capacity = 0);
 
+    DynamicBuffer(const DynamicBuffer&) = delete;
+
+    DynamicBuffer(DynamicBuffer&& b) noexcept;
+
     ~DynamicBuffer();
+
+    DynamicBuffer& operator=(const DynamicBuffer&) = delete;
+
+    DynamicBuffer& operator=(DynamicBuffer&& b) noexcept;
 
     void Reset(uint32_t offset = 0, uint32_t size = 0)
     {
@@ -198,10 +206,14 @@ public:
         SSASSERT(index >= 0 && uint32_t(index) < Size());
         return GetData<uint8_t>()[index];
     }
-
-private:
     void EnsureSpace(uint32_t size);
 
+    uint32_t FreeSpaceSize()
+    {
+        return Capacity() - offset_ - Size();
+    }
+
+private:
     void ReAllocate(uint32_t length);
 
 private:

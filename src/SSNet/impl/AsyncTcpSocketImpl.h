@@ -48,12 +48,25 @@ private:
     Data* data_;
 };
 
+// NOTE: &Data must equals to &Data::handle_
 struct AsyncTcpSocketImpl::Data {
+    Data()
+    {
+        bufferSize_ = 0x10000;
+        buffer_ = new uint8_t[bufferSize_];
+    }
+    ~Data()
+    {
+        delete[] buffer_;
+    }
     uv_tcp_t handle_ {};
     OnDataCb onDataCb_ { nullptr };
     OnCloseCb onCloseCb_ { nullptr };
     OnConnectionCb onConnectionCb { nullptr };
-    AsyncTcpSocketImpl* self_;
+    AsyncTcpSocketImpl* self_ { nullptr };
+    uint8_t* buffer_ { nullptr };
+    uint32_t bufferSize_ { 0 };
+    bool bufferUsed_ { false };
 };
 
 } // namespace ss

@@ -18,6 +18,18 @@ DynamicBuffer::DynamicBuffer(uint32_t capacity)
     }
 }
 
+DynamicBuffer::DynamicBuffer(DynamicBuffer&& b) noexcept
+    : offset_(b.offset_)
+    , size_(b.size_)
+    , capacity_(b.capacity_)
+    , buf_(b.buf_)
+{
+    b.offset_ = 0;
+    b.size_ = 0;
+    b.capacity_ = 0;
+    b.buf_ = nullptr;
+}
+
 DynamicBuffer::~DynamicBuffer()
 {
     offset_ = 0;
@@ -28,6 +40,16 @@ DynamicBuffer::~DynamicBuffer()
         buf_ = nullptr;
     }
 }
+
+DynamicBuffer& DynamicBuffer::operator=(DynamicBuffer&& b) noexcept
+{
+    std::swap(offset_, b.offset_);
+    std::swap(size_, b.size_);
+    std::swap(capacity_, b.capacity_);
+    std::swap(buf_, b.buf_);
+    return *this;
+}
+
 uint32_t DynamicBuffer::ReadData(void* buffer, uint32_t size) const
 {
     if (size > Size()) {
@@ -46,6 +68,9 @@ void DynamicBuffer::PushData(const void* data, uint32_t length)
 
 void DynamicBuffer::EnsureSpace(uint32_t size)
 {
+    if (size == 0) {
+        return;
+    }
     if (Size() + size > Capacity()) // If we need larger buffer
     {
         uint32_t newCapacity = Capacity() * 2;
@@ -55,7 +80,7 @@ void DynamicBuffer::EnsureSpace(uint32_t size)
         ReAllocate(newCapacity);
     }
 
-    uint32_t freeSpace = Capacity() - offset_ - Size();
+    uint32_t freeSpace = FreeSpaceSize();
     if (freeSpace >= size) // If we don't need to move data to make more space
     {
         return;

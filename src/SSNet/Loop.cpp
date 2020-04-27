@@ -59,7 +59,7 @@ SharedPtr<AsyncTcpSocket> Loop::CreateTcpSocket()
 {
     auto* data = new AsyncTcpSocketImpl::Data;
 
-    if (0 != uv_tcp_init(&impl_->loop_, (uv_tcp_t*)data)) {
+    if (0 != uv_tcp_init(&impl_->loop_, (uv_tcp_t*)&data->handle_)) {
         delete data;
         return nullptr;
     }
