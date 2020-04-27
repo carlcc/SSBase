@@ -55,6 +55,11 @@ void Loop::Stop()
     impl_->Stop();
 }
 
+void* Loop::GetHandle() const
+{
+    return &impl_->loop_;
+}
+
 SharedPtr<AsyncTcpSocket> Loop::CreateTcpSocket()
 {
     auto* data = new AsyncTcpSocketImpl::Data;

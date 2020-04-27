@@ -53,6 +53,10 @@ public:
     virtual void Close(OnCloseCb&& cb) = 0;
 
     virtual int ShutDown(OnShutDownCb&& cb) = 0;
+
+    virtual void* GetUserData() const = 0;
+
+    virtual void SetUserData(void* d) const = 0;
 };
 
 } // namespace ss

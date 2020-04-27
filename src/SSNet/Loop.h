@@ -27,6 +27,8 @@ public:
 
     void Stop();
 
+    void* GetHandle() const;
+
     ////
     SharedPtr<AsyncTcpSocket> CreateTcpSocket();
 
