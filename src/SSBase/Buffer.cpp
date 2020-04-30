@@ -59,6 +59,15 @@ uint32_t DynamicBuffer::ReadData(void* buffer, uint32_t size) const
     return size;
 }
 
+uint32_t DynamicBuffer::ReadData(DynamicBuffer& buffer, uint32_t size) const
+{
+    if (size > Size()) {
+        size = Size();
+    }
+    buffer.PushData(GetData<void>(), size);
+    return size;
+}
+
 void DynamicBuffer::PushData(const void* data, uint32_t length)
 {
     EnsureSpace(length);

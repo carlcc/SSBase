@@ -166,6 +166,8 @@ public:
     /// Do not pop data, invoke skip to pop data instead
     uint32_t ReadData(void* buffer, uint32_t size) const;
 
+    uint32_t ReadData(DynamicBuffer& buffer, uint32_t size) const;
+
     void PushData(const void* data, uint32_t length);
 
     void Skip(uint32_t n)

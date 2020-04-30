@@ -63,6 +63,42 @@ int AsyncTcpSocketImpl::Listen(int backlog, OnConnectionCb&& cb)
     });
 }
 
+EndPoint AsyncTcpSocketImpl::GetPeer() const
+{
+    union {
+        sockaddr_in6 addr6 ;
+        sockaddr_in addr4 ;
+        sockaddr addr;
+    } addr;
+    int namelen = sizeof(addr);
+    if (0 != uv_tcp_getpeername(&data_->handle_, &addr.addr, &namelen)) {
+       // return EndPoint();
+    }
+
+    // TODO: The following code is duplicated with EndPoint, 
+    // but I don't want to expose sockaddr struct, a better solution?
+    char buf[256];
+    switch (addr.addr.sa_family) {
+    case AF_INET6: {
+        if (0 != uv_ip6_name(&addr.addr6, buf, sizeof(buf))) {
+            buf[0] = '\0';
+        }
+        uint16_t port = addr.addr6.sin6_port;
+        return EndPoint(buf, htons(port));
+    }
+    case AF_INET:
+    default: {
+        if (0 != uv_ip4_name(&addr.addr4, buf, sizeof(buf))) {
+            buf[0] = '\0';
+        }
+        uint16_t port = addr.addr4.sin_port;
+        return EndPoint(buf, htons(port));
+    }
+    }
+
+    return EndPoint();
+}
+
 SharedPtr<AsyncTcpSocket> AsyncTcpSocketImpl::Accept()
 {
     auto* data = new AsyncTcpSocketImpl::Data;
@@ -83,6 +119,7 @@ SharedPtr<AsyncTcpSocket> AsyncTcpSocketImpl::Accept()
 
 int AsyncTcpSocketImpl::Send(const void* data, uint32_t length, OnSendCb&& cb)
 {
+    // TODO: try send first, then send the rest
     if (data_ == nullptr) {
         return UV_EINVAL;
     }

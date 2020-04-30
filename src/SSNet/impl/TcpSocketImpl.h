@@ -174,7 +174,12 @@ public:
         linger l {};
         l.l_onoff = b ? 1 : 0;
         l.l_onoff = delaySeconds;
+
+#ifdef SS_PLATFORM_WIN32
+        return setsockopt(sockFd_, SOL_SOCKET, SO_LINGER, (const char*)&l, sizeof(linger));
+#else
         return setsockopt(sockFd_, SOL_SOCKET, SO_LINGER, &l, sizeof(linger));
+#endif
     }
 
 private:

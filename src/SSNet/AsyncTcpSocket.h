@@ -6,12 +6,11 @@
 
 #include "../SSBase/Object.h"
 #include "../SSBase/Ptr.h"
+#include "EndPoint.h"
 #include <functional>
 #include <uv.h>
 
 namespace ss {
-
-class EndPoint;
 
 class AsyncTcpSocket : public Object {
     SS_OBJECT(AsyncTcpSocket, Object);
@@ -27,6 +26,8 @@ public:
     using OnConnectionCb = std::function<void(AsyncTcpSocket* server, int status)>;
     using OnShutDownCb = std::function<void(int status)>;
 
+    using OnReleaseData = std::function<void(void* userData)>;
+
     static const String kSigClose;
 
     virtual int Connect(const EndPoint& ep, OnConnectCb&& cb) = 0;
@@ -40,6 +41,8 @@ public:
     int Bind(const String& host, uint16_t port);
 
     virtual int Listen(int backlog, OnConnectionCb&& cb) = 0;
+
+    virtual EndPoint GetPeer() const = 0;
 
     virtual SharedPtr<AsyncTcpSocket> Accept() = 0;
 
@@ -56,7 +59,7 @@ public:
 
     virtual void* GetUserData() const = 0;
 
-    virtual void SetUserData(void* d) const = 0;
+    virtual void SetUserData(void* d, OnReleaseData&& onRelease) const = 0;
 };
 
 } // namespace ss
