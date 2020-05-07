@@ -41,12 +41,6 @@ public:
         return reinterpret_cast<const T*>(buf_ + offset_);
     }
 
-    template <class T>
-    T* GetEndPtr()
-    {
-        return reinterpret_cast<T*>(buf_ + offset_ + size_);
-    }
-
     uint32_t ReadData(void* buffer, uint32_t size) const
     {
         if (size > Size()) {
@@ -167,6 +161,18 @@ public:
     const T* GetData() const
     {
         return reinterpret_cast<const T*>(buf_ + offset_);
+    }
+
+    template <class T>
+    T* GetEndPtr()
+    {
+        return reinterpret_cast<T*>(buf_ + offset_ + size_);
+    }
+
+    template <class T>
+    const T* GetEndPtr() const
+    {
+        return reinterpret_cast<T*>(buf_ + offset_ + size_);
     }
 
     /// Do not pop data, invoke skip to pop data instead
