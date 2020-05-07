@@ -41,6 +41,12 @@ public:
         return reinterpret_cast<const T*>(buf_ + offset_);
     }
 
+    template <class T>
+    T* GetEndPtr()
+    {
+        return reinterpret_cast<T*>(buf_ + offset_ + size_);
+    }
+
     uint32_t ReadData(void* buffer, uint32_t size) const
     {
         if (size > Size()) {
