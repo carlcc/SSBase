@@ -388,6 +388,7 @@ SS_DEFINE_COMPARE_OPERATOR(String, String)
 #undef SS_DEFINE_COMPARE_OPERATOR
 
 std::ostream& operator<<(std::ostream& os, const CharSequence& s);
+std::istream& operator>>(std::istream& is, String& s);
 
 } // namespace ss
 

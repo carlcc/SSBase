@@ -977,4 +977,12 @@ std::ostream& operator<<(std::ostream& os, const CharSequence& s)
     return os;
 }
 
+std::istream& operator>>(std::istream& is, String& s)
+{
+    std::string stdStr;
+    is >> stdStr;
+    s = stdStr.c_str();
+    return is;
+}
+
 } // namespace ss

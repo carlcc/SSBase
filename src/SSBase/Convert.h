@@ -61,6 +61,16 @@ public:
         ss >> t;
         return t;
     }
+
+    template <class T>
+    static String ToString(const T& t)
+    {
+        std::stringstream ss;
+        String s;
+        ss << t;
+        ss >> s;
+        return s;
+    }
 };
 
 } // namespace ss
