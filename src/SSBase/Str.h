@@ -16,10 +16,24 @@ namespace ss {
 class String;
 class StringView;
 
+// clang-format off
+struct CharWrapper {
+    template <class T>
+    CharWrapper(T c): code(c) {} // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    uint32_t code;
+};
+inline bool operator< (CharWrapper a, CharWrapper b) { return a.code <  b.code; }
+inline bool operator> (CharWrapper a, CharWrapper b) { return a.code >  b.code; }
+inline bool operator<=(CharWrapper a, CharWrapper b) { return a.code <= b.code; }
+inline bool operator>=(CharWrapper a, CharWrapper b) { return a.code >= b.code; }
+inline bool operator==(CharWrapper a, CharWrapper b) { return a.code == b.code; }
+inline bool operator!=(CharWrapper a, CharWrapper b) { return a.code != b.code; }
+// clang-format off
+
 /// CharSequence object should be a derived class, pure CharSequence object is not allowd.
 class CharSequence {
 public:
-    using CharType = uint32_t;
+    using CharType = CharWrapper;
     enum {
         kNPos = uint32_t(-1)
     };

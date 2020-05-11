@@ -6,7 +6,9 @@
 
 #include "../SSBase/Object.h"
 #include "../SSBase/Ptr.h"
+#include "../SSBase/Str.h"
 #include <map>
+#include <vector>
 
 namespace ss {
 

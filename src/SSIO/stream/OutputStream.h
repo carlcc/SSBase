@@ -5,6 +5,7 @@
 #pragma once
 
 #include "../../SSBase/Object.h"
+#include "../../SSBase/Str.h"
 
 namespace ss {
 

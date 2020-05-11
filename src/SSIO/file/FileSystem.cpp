@@ -120,7 +120,7 @@ String FileSystem::NormalizePath(const CharSequence& path, bool internalSeparato
 bool FileSystem::IsAbsolutePath(const CharSequence& path)
 {
 #ifdef SS_PLATFORM_WIN32
-    return path.Length() >= 3 && String::IsAsciiAlpha(path[0]) && path[1] == ':' && IsSeparatorInternal(path[2]);
+    return path.Length() >= 3 && String::IsAsciiAlpha(path[0]) && path[1].code == ':' && IsSeparatorInternal(path[2]);
 #else
     return path.Length() >= 1 && IsSeparatorInternal(path[0]);
 #endif
@@ -448,7 +448,7 @@ String FileSystem::RemoveDotDotInternal(const CharSequence& path, char separator
 }
 bool FileSystem::IsSeparatorInternal(CharSequence::CharType c)
 {
-    return c == '/' || c == '\\';
+    return c.code == '/' || c.code == '\\';
 }
 
 void FileSystem::NormalizeSeparatorInternal(String& path, char separator)
@@ -456,7 +456,7 @@ void FileSystem::NormalizeSeparatorInternal(String& path, char separator)
     uint32_t i = 0, j = 0;
     while (j < path.Length()) {
         if (IsSeparatorInternal(path[j])) {
-            path[i] = separator;
+            path[i].code = separator;
             ++i;
             ++j;
             // Skip the rest continuous separators

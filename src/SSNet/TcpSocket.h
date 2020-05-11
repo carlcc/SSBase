@@ -5,6 +5,8 @@
 #pragma once
 
 #include "../SSBase/Object.h"
+#include "../SSBase/Ptr.h"
+#include "../SSBase/Str.h"
 #include "SocketDef.h"
 #include <cstdint>
 

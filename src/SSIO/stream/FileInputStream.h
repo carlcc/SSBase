@@ -6,6 +6,7 @@
 
 #include "SeekableInputStream.h"
 #include "StreamConstant.h"
+
 #include <cstdio>
 
 namespace ss {

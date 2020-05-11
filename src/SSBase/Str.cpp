@@ -213,39 +213,43 @@ struct CharSequence::SequenceData {
     }
 };
 
-bool CharSequence::IsAsciiAlpha(CharType c)
+bool CharSequence::IsAsciiAlpha(CharType ch)
 {
-    return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
+    auto& c = ch.code;
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
-bool CharSequence::IsAlpha(CharType c)
+bool CharSequence::IsAlpha(CharType ch)
 {
     const uint32_t AA = L'Ａ';
     const uint32_t ZZ = L'Ｚ';
     const uint32_t aa = L'ａ';
     const uint32_t zz = L'ｚ';
-    return IsAsciiAlpha(c) || c >= aa && c <= zz || c >= AA && c <= ZZ;
+    auto& c = ch.code;
+    return IsAsciiAlpha(ch) || (c >= aa && c <= zz) || (c >= AA && c <= ZZ);
 }
 
-bool CharSequence::IsUpper(CharSequence::CharType c)
+bool CharSequence::IsUpper(CharSequence::CharType ch)
 {
     const uint32_t A = 'A';
     const uint32_t Z = 'Z';
     const uint32_t AA = L'Ａ';
     const uint32_t ZZ = L'Ｚ';
+    auto& c = ch.code;
     return (c >= A && c <= Z) || (c >= AA && c <= ZZ);
 }
 
-bool CharSequence::IsLower(CharSequence::CharType c)
+bool CharSequence::IsLower(CharSequence::CharType ch)
 {
     const uint32_t a = 'a';
     const uint32_t z = 'z';
     const uint32_t aa = L'ａ';
     const uint32_t zz = L'ｚ';
+    auto& c = ch.code;
     return (c >= aa && c <= zz) || (c >= a && c <= z);
 }
 
-CharSequence::CharType CharSequence::ToUpper(CharSequence::CharType c)
+CharSequence::CharType CharSequence::ToUpper(CharSequence::CharType ch)
 {
     const uint32_t a = 'a';
     const uint32_t A = 'A';
@@ -253,16 +257,17 @@ CharSequence::CharType CharSequence::ToUpper(CharSequence::CharType c)
     const uint32_t aa = L'ａ';
     const uint32_t AA = L'Ａ';
     const uint32_t zz = L'ｚ';
+    auto& c = ch.code;
     if (c >= a && c <= z) {
-        return c + A - a;
+        return CharType { c + A - a };
     }
     if (c >= aa && c <= zz) {
-        return c + AA - aa;
+        return CharType { c + AA - aa };
     }
-    return c;
+    return ch;
 }
 
-CharSequence::CharType CharSequence::ToLower(CharSequence::CharType c)
+CharSequence::CharType CharSequence::ToLower(CharSequence::CharType ch)
 {
     const uint32_t a = 'a';
     const uint32_t A = 'A';
@@ -270,13 +275,14 @@ CharSequence::CharType CharSequence::ToLower(CharSequence::CharType c)
     const uint32_t aa = L'ａ';
     const uint32_t AA = L'Ａ';
     const uint32_t ZZ = L'Ｚ';
+    auto& c = ch.code;
     if (c >= A && c <= Z) {
-        return c + a - A;
+        return CharType { c + a - A };
     }
     if (c >= AA && c <= ZZ) {
-        return c + aa - AA;
+        return CharType { c + aa - AA };
     }
-    return c;
+    return ch;
 }
 
 bool CharSequence::IsWhiteSpace(CharSequence::CharType c)
@@ -338,7 +344,7 @@ bool CharSequence::IsWhiteSpace(CharSequence::CharType c)
         LINE_SEPARATOR,
         PARAGRAPH_SEPARATOR,
     };
-    return kSpaces.find(c) != kSpaces.end();
+    return kSpaces.find(c.code) != kSpaces.end();
 }
 
 CharSequence::CharSequence()
@@ -513,7 +519,7 @@ uint32_t CharSequence::GetBytesLength(CharSequence::CharSet charSet) const
     SSASSERT(charSet == kUtf8);
     uint32_t utf8Length = 0;
     for (uint32_t i = 0; i < Length(); ++i) {
-        utf8::write(At(i), [&utf8Length](utf8::char_type c) { ++utf8Length; });
+        utf8::write(At(i).code, [&utf8Length](utf8::char_type c) { ++utf8Length; });
     }
     return utf8Length;
 }
@@ -524,7 +530,7 @@ void CharSequence::GetBytes(CharSet charSet, void* buffer) const
     auto* p = static_cast<utf8::char_type*>(buffer);
     uint32_t index = 0;
     for (uint32_t i = 0; i < Length(); ++i) {
-        utf8::write(At(i), [p, &index](utf8::char_type c) { p[index++] = c; });
+        utf8::write(At(i).code, [p, &index](utf8::char_type c) { p[index++] = c; });
     }
     p[index] = '\0';
 }
@@ -542,7 +548,7 @@ std::wstring CharSequence::ToStdWString() const
 {
     std::wstring ss(Length(), L'\0');
     for (uint32_t i = 0; i < Length(); ++i) {
-        ss[i] = At(i);
+        ss[i] = At(i).code;
     }
     return ss;
 }
@@ -552,7 +558,7 @@ uint64_t CharSequence::Hash() const
     // djb2
     uint64_t hash = 5381;
     for (uint32_t i = 0; i < Length(); ++i) {
-        hash = ((hash << 5u) + hash) + At(i); /* hash * 33 + c */
+        hash = ((hash << 5u) + hash) + At(i).code; /* hash * 33 + c */
     }
     return hash;
 }
@@ -691,7 +697,7 @@ String::String(const char* utf8, uint32_t bytesCount)
     auto readFn = [&index, utf8]() -> utf8::char_type { return (utf8::char_type)utf8[index++]; };
 
     for (uint32_t i = 0; i < length_; ++i) {
-        sequenceData_->chars_[i] = utf8::read(readFn);
+        sequenceData_->chars_[i] = CharType { utf8::read(readFn) };
     }
 }
 
@@ -706,7 +712,7 @@ String::String(const wchar_t* unicode, uint32_t charCount)
     ReAllocate(CalculateCapacity(length_));
 
     for (uint32_t i = 0; i < length_; ++i) {
-        sequenceData_->chars_[i] = unicode[i];
+        sequenceData_->chars_[i] = CharType { unicode[i] };
     }
 }
 
@@ -838,7 +844,7 @@ String& String::operator=(const char* utf8)
     auto readFn = [&index, utf8]() -> utf8::char_type { return (utf8::char_type)utf8[index++]; };
 
     for (uint32_t i = 0; i < length_; ++i) {
-        sequenceData_->chars_[i] = utf8::read(readFn);
+        sequenceData_->chars_[i] = CharType { utf8::read(readFn) };
     }
     return *this;
 }
@@ -859,7 +865,7 @@ String& String::operator+=(const char* utf8)
     auto readFn = [&index, utf8]() -> utf8::char_type { return (utf8::char_type)utf8[index++]; };
 
     for (uint32_t i = 0; i < utf8Len; ++i) {
-        sequenceData_->chars_[i + oldLen] = utf8::read(readFn);
+        sequenceData_->chars_[i + oldLen] = CharType { utf8::read(readFn) };
     }
     return *this;
 }
@@ -871,7 +877,7 @@ String& String::operator=(const wchar_t* unicode)
         ReAllocate(CalculateCapacity(length_));
     }
     for (uint32_t i = 0; i < length_; ++i) {
-        sequenceData_->chars_[i] = unicode[i];
+        sequenceData_->chars_[i] = CharType { unicode[i] };
     }
     return *this;
 }
@@ -883,7 +889,7 @@ String& String::operator+=(const wchar_t unicode)
     if (Capacity() < length_) {
         ReAllocate(CalculateCapacity(length_));
     }
-    sequenceData_->chars_[oldLen] = unicode;
+    sequenceData_->chars_[oldLen] = CharType { unicode };
     return *this;
 }
 
@@ -894,7 +900,7 @@ String& String::operator+=(const char c)
     if (Capacity() < length_) {
         ReAllocate(CalculateCapacity(length_));
     }
-    sequenceData_->chars_[oldLen] = c;
+    sequenceData_->chars_[oldLen].code = c;
     return *this;
 }
 
@@ -910,7 +916,7 @@ String& String::operator+=(const wchar_t* unicode)
         ReAllocate(CalculateCapacity(length_));
     }
     for (uint32_t i = 0; i < len; ++i) {
-        sequenceData_->chars_[i + oldLen] = unicode[i];
+        sequenceData_->chars_[i + oldLen] = CharType { unicode[i] };
     }
     return *this;
 }

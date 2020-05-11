@@ -6,6 +6,7 @@
 
 #include <SSBase/Assert.h>
 #include <SSBase/Str.h>
+#include <set>
 
 namespace TestString {
 
